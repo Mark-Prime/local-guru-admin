@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding: 0;
+  padding: 0 !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
@@ -11,4 +11,35 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.Polaris-Navigation {
+  position: sticky;
+  top: 0;
+  height: 100vh !important;
+}
+
+.Polaris-Layout {
+
+}
+
+.Polaris-Page {
+  width: 85vw !important;
+  max-width: none !important;
+}
+
+.Polaris-DataTable__Cell img {
+  width: 3vw;
+  padding: 1rem 0;
+}
+
+.Polaris-ResourceList-Item__Content h3 {
+  display: flex;
+  align-items: center;
+}
+
+.Polaris-Thumbnail__Image {
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
 }
