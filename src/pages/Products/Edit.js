@@ -1,12 +1,11 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Page, Layout, Card } from '@shopify/polaris';
-import { getPhoto, editPhoto } from '../../actions/PhotoActions';
-import { toggleToast } from '../../actions/UIActions';
-import { withRouter } from 'react-router-dom';
-import EditPhoto from '../../components/EditPhoto';
-import EditTags from '../../components/EditTags';
-import styled from 'styled-components';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Page, Layout, Card, Autocomplete } from '@shopify/polaris'
+import { fetchAllProducts, editProduct, fetchSingleProduct } from '../../actions/ProductActions'
+import { toggleToast } from '../../actions/UIActions'
+import { withRouter } from 'react-router-dom'
+import EditProduct from '../../components/EditProduct'
+import styled from 'styled-components'
 
 const Image = styled.div`
   img {
@@ -14,19 +13,31 @@ const Image = styled.div`
   }
 `;
 
-class Edit extends Component {
+class EditSingleProduct extends Component {
 
   state = {
     isLoaded: false,
-    photo: {},
-    values: {},
+    values: {
+      description: '',
+      price: 0,
+      unit: ''
+    },
+    inputText: '',
     touched: false,
   }
 
   componentDidMount(){
-    const sku = this.props.match.params.sku;
-    getPhoto(sku).then(photo => {
-      this.setState({ photo: photo, values: photo, isLoaded: true })
+    const { id } = this.props.match.params;
+    fetchSingleProduct(id)
+    .then(product => {
+      const { description, image, price, unit, title } = product;
+      this.setState({ values: {
+        description: description,
+        price: price,
+        unit: unit,
+        image: image,
+        title: title
+      } })
     })
   }
 
@@ -35,16 +46,33 @@ class Edit extends Component {
     this.setState({ values: { ...this.state.values, [id]: value }})
   }
 
+  updateText = (newValue) => {
+     this.setState({inputText: newValue});
+     this.filterAndUpdateOptions(newValue);
+   };
+
   handleSelectChange = (value, id) => {
     this.setState({ touched: true })
     this.setState({ values: { ...this.state.values, [id]: value} })
   }
 
+  handleFocus = (e) => {
+    e.target.select()
+  }
+
+  handleCurrencyBlur = () => {
+    const price = Number(this.state.values.price).toFixed(2)
+    this.setState({ values: { ... this.state.values, price: price } })
+  }
+
   handleSubmit = () => {
-    const { photo, values } = this.state;
-    editPhoto(photo.sku, values)
+    const { values } = this.state;
+    const { user } = this.props;
+    const { id } = this.props.match.params;
+
+    editProduct(user, id, values)
     .then(() => {
-      getPhoto(photo.sku).then(photo => {
+      fetchSingleProduct(id).then(photo => {
         this.setState({ photo: photo, values: photo, isLoaded: true, touched: false })
       })
     })
@@ -56,76 +84,57 @@ class Edit extends Component {
     })
   }
 
-  addTag = tag => {
-    let { tags } = this.state.values;
-    if (typeof tags !== 'undefined') {
-      tags.push(tag);
-    } else {
-      tags = [tag];
-    }
-    this.setState({ touched: true, values: { ...this.state.values, tags: tags } })
-  }
-
-  removeTag = tag => {
-    let filteredArray = this.state.values.tags.filter(item => item !== tag)
-    this.setState({ touched: true, values: { ...this.state.values, tags:  filteredArray }});
-  }
-
   goBack = () => {
     this.props.history.goBack();
   }
 
   render() {
 
-    const { isLoaded, photo, touched, values } = this.state;
+    const { isLoaded, photo, touched, values, selected, products } = this.state;
+    const { price, description } = values;
 
     return (
-      <>
-        {isLoaded
-          ?
-            <Page
-              breadcrumbs={[{content: 'Photos', onAction: this.goBack}]}
-              title={photo.title}
-              primaryAction={{ content: 'Save', disabled: !touched, onAction: this.handleSubmit }}
-              secondaryActions={[{
-                  icon: 'view',
-                  content: 'View Photo',
-                  url: `https://tonl-beta.firebaseapp.com/photo/${photo.sku}`
-              }]}
-            >
-              <Layout>
-                <Layout.Section>
-                  <EditPhoto
-                    title={values.title}
-                    description={values.description}
-                    color={values.color}
-                    race={values.race}
-                    collection={values.collection}
-                    handleChangeTextField={this.handleChangeTextField}
-                    handleSelectChange={this.handleSelectChange}
-                  />
-                </Layout.Section>
-                <Layout.Section secondary>
-                  <Card sectioned>
-                    <Image>
-                      <img src={`https://s3-us-west-2.amazonaws.com/tonl-photosresized/images/medium/${photo.sku}.jpg`} alt={photo.title} />
-                    </Image>
-                  </Card>
-                  <EditTags
-                    addTag={this.addTag}
-                    removeTag={this.removeTag}
-                    tags={values.tags}
-                  />
-                </Layout.Section>
-              </Layout>
-            </Page>
-          :
-            null
-        }
-      </>
+      <Page
+        breadcrumbs={[{content: 'Products', onAction: this.goBack}]}
+        title='Add Product'
+        primaryAction={{ content: 'Save', disabled: !touched, onAction: this.handleSubmit }}
+      >
+        <Layout>
+          <Layout.Section>
+            <EditProduct
+              edit
+              products={products}
+              title={this.state.values.title}
+              selected={selected}
+              description={values.description}
+              price={price}
+              unit={this.state.values.unit}
+              handleProductChoice={this.handleProductChoice}
+              handleChangeTextField={this.handleChangeTextField}
+              handleSelectChange={this.handleSelectChange}
+              handleFocus={this.handleFocus}
+              handleCurrencyBlur={this.handleCurrencyBlur}
+            />
+          </Layout.Section>
+          <Layout.Section secondary>
+            <Card sectioned>
+              <Image>
+                {selected !== ''
+                  ?
+                    <img src={this.state.values.image} alt={this.state.title} />
+                  :
+                    null
+                }
+              </Image>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </Page>
     );
   }
 
 }
 
-export default withRouter(connect((state, ownProps) => ({}), { toggleToast })(Edit));
+export default withRouter(connect((state, ownProps) => ({
+  user: state.user
+}), { toggleToast })(EditSingleProduct));

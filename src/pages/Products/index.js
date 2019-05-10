@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { fetchUserProducts } from '../../actions/ProductActions'
 import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, FilterType } from '@shopify/polaris'
 import Moment from 'react-moment'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
 
@@ -18,7 +19,7 @@ const PaginationFooter = styled.div`
   height: 100px;
 `;
 
-class AddProduct extends Component {
+class Products extends Component {
 
   state = {
     page: 1,
@@ -90,13 +91,13 @@ class AddProduct extends Component {
   }
 
   renderItem = (item) => {
-    const {sku, title, created_at, image} = item;
+    const {id, title, created_at, image} = item;
     const media = <Thumbnail alt={title} source={image} />;
 
     return (
       <ResourceList.Item
-        id={sku}
-        url={`/product/${sku}`}
+        id={id}
+        url={`/product/edit/${id}`}
         media={media}
         accessibilityLabel={`View details for ${title}`}
       >
@@ -212,4 +213,4 @@ class AddProduct extends Component {
 export default withRouter(connect((state, ownProps) => ({
   products: state.products,
   user: state.user
-}), { fetchUserProducts })(AddProduct));
+}), { fetchUserProducts })(Products));

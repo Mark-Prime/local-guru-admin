@@ -1,4 +1,4 @@
-import { db } from '../firebase.js';
+import { db } from '../firebase'
 
 export const FETCH_ALL_PRODUCTS = 'fetch_all_products';
 export const FETCH_USER_PRODUCTS = 'fetch_user_products';
@@ -93,17 +93,26 @@ export function fetchSingleProduct(id) {
 }
 
 export function editProduct(user, id, values){
-  console.log('user', user)
-  console.log('id', id)
   const name = `${user.name.first} ${user.name.last}`
-  console.log('name', name)
   const { photo,  uid} = user
 
   const { description, price } = values;
   return db.collection('products').doc(id).collection('producers').doc(uid).set({
     [(name !== '') && 'name']: name,
     [(photo !== '') && 'photo']: photo,
-    [(price !== '') && 'price']: price,
+    [(price !== '') && 'price']: Number(price),
     [(description !== '') && 'description']: description,
   },{ merge: true })
+  .then(() => {
+    return db.collection('products').doc(id).get()
+  })
+  .then(product => {
+    if(product.data().producers && typeof product.data().producers.user === 'undefined'){
+      const { producers } = product.data()
+
+      return db.collection('products').doc(id).set({
+        producers: { [uid]: price, ...producers }
+      }, { merge: true } )
+    }
+  })
 }

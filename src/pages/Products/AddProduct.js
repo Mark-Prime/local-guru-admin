@@ -68,7 +68,12 @@ class AddProduct extends Component {
     editProduct(user, selected, values)
     .then(() => {
       fetchSingleProduct(selected).then(photo => {
-        this.setState({ photo: photo, values: photo, isLoaded: true, touched: false })
+        this.setState({
+            photo: photo,
+            values: photo,
+            isLoaded: true, 
+            touched: false
+          })
       })
     })
     .then(() => {
@@ -90,7 +95,7 @@ class AddProduct extends Component {
 
     return (
       <Page
-        breadcrumbs={[{content: 'Photos', onAction: this.goBack}]}
+        breadcrumbs={[{content: 'Products', onAction: this.goBack}]}
         title='Add Product'
         primaryAction={{ content: 'Save', disabled: !touched, onAction: this.handleSubmit }}
       >

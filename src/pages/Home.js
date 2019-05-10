@@ -1,24 +1,16 @@
 import React from 'react'
 import { Page, DisplayText, TextStyle, Layout, CalloutCard } from '@shopify/polaris'
+import OrderPreview from '../components/OrderPreview'
 
 const { Section } = Layout
 
-const Home = ({props}) => (
+const Home = ({ transactions }) => (
   <div>
     <Page title='Welcome, Jermaine'>
       <TextStyle variation="subdued"><DisplayText>Here's what's happening with your products today</DisplayText></TextStyle>
       <br/><br/>
       <Layout>
-        <Section oneThird>
-          <p>Today's total sales</p>
-          <br/>
-          <DisplayText size='large'>$89.34</DisplayText>
-        </Section>
-        <Section oneThird>
-          <p>Today's visits</p>
-          <br/>
-          <DisplayText size='large'>120</DisplayText>
-        </Section>
+        <OrderPreview />
       </Layout>
       <br/><br/>
       <CalloutCard

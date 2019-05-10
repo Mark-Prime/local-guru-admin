@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Form, FormLayout, TextField, Select, Autocomplete, Icon } from '@shopify/polaris';
+import { Card, Form, FormLayout, TextField, Autocomplete, Icon } from '@shopify/polaris';
 import PropTypes from 'prop-types';
 
 class EditPhoto extends Component {
@@ -10,7 +10,7 @@ class EditPhoto extends Component {
 
   render() {
 
-    const { title, unit, products, price, description, selected, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
+    const { edit, title, unit, products, price, description, selected, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
 
     const textField = (
       <Autocomplete.TextField
@@ -24,21 +24,25 @@ class EditPhoto extends Component {
 
     let titleOptions = [];
 
-    Object.keys(products).map((product, index) => {
-      titleOptions[index] = { value: product, label: products[product].title }
-    })
+    if(!edit){
+      Object.keys(products).map((product, index) => {
+        return titleOptions[index] = { value: product, label: products[product].title }
+      })
+    }
 
     return (
       <Card>
         <Form onSubmit={this.handleSubmit}>
           <Card.Section>
             <FormLayout>
-              <Autocomplete
-                options={titleOptions}
-                selected={selected}
-                onSelect={handleProductChoice}
-                textField={textField}
-              />
+              {!edit &&
+                <Autocomplete
+                  options={titleOptions}
+                  selected={selected}
+                  onSelect={handleProductChoice}
+                  textField={textField}
+                />
+              }
               <TextField
                 value={description}
                 id='description'
