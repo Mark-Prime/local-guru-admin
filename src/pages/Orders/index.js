@@ -6,7 +6,7 @@ import Moment from 'react-moment'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
 import OrderPreview from '../../components/OrderPreview'
-
+import OrderOverview from '../../components/OrderOverview'
 
 const PaginationFooter = styled.div`
   display: flex;
@@ -69,7 +69,6 @@ class Orders extends Component {
   }
 
   handleModalToggle = (type) => {
-    console.log('toggle modal')
     this.setState({ modalOpen: !this.state.modalOpen, modalType: type })
   }
 
@@ -117,7 +116,6 @@ class Orders extends Component {
          let updatedItems = orders[uid].items;
 
          Object.keys(transaction.items).map(item => {
-           console.log(updatedItems)
            // Check if this item has been seen
            if(updatedItems[item]){
              // If it does exist, add the counts
@@ -126,7 +124,6 @@ class Orders extends Component {
                count: transaction.items[item].count + updatedItems[item].count
              }
            } else {
-             console.log(transaction.items[item].title)
              updatedItems[item] = transaction.items[item]
            }
          })
@@ -138,7 +135,6 @@ class Orders extends Component {
        }
     })
 
-    console.log(orders)
     return Object.values(orders)
   }
 
@@ -193,7 +189,9 @@ class Orders extends Component {
         <Layout>
           <OrderPreview />
         </Layout>
-        <br/>
+        <br/><br/>
+        <OrderOverview orders={this.props.transactions} user={this.props.user.uid} />
+        <br/><br/>
         <Card>
           {this.state.isLoaded
             ?
