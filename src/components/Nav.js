@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import { Navigation } from '@shopify/polaris';
+import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
+import { Navigation } from '@shopify/polaris'
+import PropTypes from 'prop-types'
 
 const Section = Navigation.Section;
 
@@ -57,6 +58,10 @@ class Nav extends Component {
     </Navigation>
     )
   }
-};
+}
+
+Nav.propTypes = {
+  location: PropTypes.object.isRequired
+}
 
 export default withRouter(Nav);

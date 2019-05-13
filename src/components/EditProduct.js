@@ -79,7 +79,17 @@ class EditPhoto extends Component {
 }
 
 EditPhoto.propTypes = {
-  title: PropTypes.string
+  title: PropTypes.string,
+  edit: PropTypes.bool,
+  unit: PropTypes.string.isRequired,
+  products: PropTypes.object.isRequired,
+  price: PropTypes.number.isRequired,
+  description: PropTypes.string.isRequired,
+  selected: PropTypes.string.isRequired,
+  handleProductChoice: PropTypes.func.isRequired,
+  handleFocus: PropTypes.func.isRequired,
+  handleChangeTextField: PropTypes.func.isRequired,
+  handleCurrencyBlur: PropTypes.func.isRequired
 }
 
 export default EditPhoto;

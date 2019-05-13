@@ -10,8 +10,11 @@ export function fetchTransactions(producer) {
       let transactions = []
 
       snapshot.docs.map((doc, index) => {
-        return transactions[index] = doc.data()
+        console.log(doc.data())
+        return transactions = [doc.data(), ...transactions]
       })
+
+      console.log(transactions)
 
       return dispatch({
         type: FETCH_TRANSACTIONS,

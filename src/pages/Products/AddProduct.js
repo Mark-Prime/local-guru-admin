@@ -6,6 +6,7 @@ import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
 import EditProduct from '../../components/EditProduct'
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
 
 const Image = styled.div`
   img {
@@ -71,7 +72,7 @@ class AddProduct extends Component {
         this.setState({
             photo: photo,
             values: photo,
-            isLoaded: true, 
+            isLoaded: true,
             touched: false
           })
       })
@@ -131,7 +132,11 @@ class AddProduct extends Component {
       </Page>
     );
   }
+}
 
+AddProduct.propTypes = {
+  user: PropTypes.object.isRequired,
+  toggleToast: PropTypes.func.isRequired
 }
 
 export default withRouter(connect((state, ownProps) => ({
