@@ -102,39 +102,43 @@ class Orders extends Component {
 
   transformTransactions = (transactions) => {
 
+    // create empty object
     let orders = {}
 
     // Map through transactions array
-    transactions.map(transaction => {
-      // Get User UID from transaction
-       const { uid } = transaction.user;
+    transactions.forEach(transaction => {
 
-      // Check if we've seen this user
-       if(orders[uid]){
-         // If we've already seen this user, combine their order
+      // Get User ID
+      const { uid } = transaction.user;
+      let currentUserOrder = orders[uid];
 
-         let updatedItems = orders[uid].items;
+      // check if user is in orders object
+      if(currentUserOrder){
 
-         Object.keys(transaction.items).map(item => {
-           // Check if this item has been seen
-           if(updatedItems[item]){
-             // If it does exist, add the counts
-             updatedItems[item] = {
-               ...transaction.items[item],
-               count: transaction.items[item].count + updatedItems[item].count
-             }
-           } else {
-             updatedItems[item] = transaction.items[item]
-           }
-         })
+        // map through the items in the transaction
+        Object.keys(transaction.items).map(item => {
 
-         orders[uid] = { ...orders[uid], items: updatedItems }
-       } else {
-         // Otherwise add this user
-         orders = { [uid]: transaction , ...orders}
-       }
+          let currentItem = currentUserOrder.items[item];
+
+          // if the items already exists, add to it
+          if(currentItem){
+            const newCount = currentItem.count + transaction.items[item].count
+            currentUserOrder.items = {
+              ...currentUserOrder.items,
+              [item]: { count: newCount  }
+            }
+          } else {
+            orders[uid].items[item] = transaction.items[item]
+          }
+        })
+
+      // If they don't add the first transaction
+      } else {
+        orders = { [uid]: transaction }
+      }
     })
 
+    console.log(orders)
     return Object.values(orders)
   }
 
