@@ -4,7 +4,6 @@ import { Card, List, Thumbnail, Stack, TextContainer, TextStyle } from '@shopify
 const { Section } = Card;
 
 const getOverview = (orders, user) => {
-  console.log(orders)
   let items = {}
 
   orders.map(order => {
