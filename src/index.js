@@ -7,6 +7,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { applyMiddleware, createStore, compose } from 'redux'
 import thunk from 'redux-thunk'
 import reducers from './reducers'
+import { StripeProvider, Elements } from 'react-stripe-elements'
 import { Provider } from 'react-redux'
 import { AppProvider } from '@shopify/polaris'
 
@@ -19,11 +20,15 @@ const store = createStore(
 
 ReactDOM.render(
   <Provider store={store}>
-    <AppProvider>
-      <Router>
-        <App />
-      </Router>
-    </AppProvider>
+    <StripeProvider apiKey="pk_test_cYlKdbvRzgYVBKgtXVlg4UPE">
+      <Elements>
+      <AppProvider>
+        <Router>
+          <App />
+        </Router>
+      </AppProvider>
+      </Elements>
+    </StripeProvider>
   </Provider>
 , document.getElementById('root'));
 

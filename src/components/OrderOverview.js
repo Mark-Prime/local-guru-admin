@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, List, Thumbnail, Stack, TextContainer, TextStyle } from '@shopify/polaris'
+import { Card, Thumbnail, Stack, TextContainer, TextStyle } from '@shopify/polaris'
 
 const { Section } = Card;
 

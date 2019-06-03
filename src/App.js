@@ -7,10 +7,13 @@ import Nav from './components/Nav'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Products from './pages/Products'
+import Login from './pages/Login'
 import Orders from './pages/Orders'
 import EditSingleProduct from './pages/Products/Edit'
 import AddProduct from './pages/Products/AddProduct'
 import { toggleToast } from './actions/UIActions'
+import Settings from './pages/Settings'
+import { getProducer } from './actions/UserActions'
 import { fetchTransactions } from './actions/TransactionActions'
 
 const { Section } = Layout;
@@ -23,6 +26,7 @@ const Wrapper = styled.div`
 class App extends Component {
 
   componentDidMount(){
+    this.props.getProducer()
     this.props.fetchTransactions(this.props.user.uid)
   }
 
@@ -39,6 +43,8 @@ class App extends Component {
                 <Route path='/orders' component={Orders} />
                 <Route path='/products/add' component={AddProduct} />
                 <Route exact path='/products' component={Products} />
+                <Route path='/account' component={Settings} />
+                <Route path='/login' component={Login} />
               </Switch>
             </Section>
           </Layout>
@@ -58,4 +64,4 @@ export default withRouter(connect((state, ownProps) => ({
   ui: state.ui,
   user: state.user,
   transactions: state.transactions
-}), { toggleToast, fetchTransactions })(App));
+}), { toggleToast, fetchTransactions, getProducer })(App));

@@ -1,8 +1,10 @@
 import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
+import '@firebase/auth'
+import '@firebase/firestore'
+import '@firebase/functions'
 
-var config = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
+// Initialize Firebase
+var config = {
   apiKey: "AIzaSyCqI7KAjxmqY-SRw6xA9ICTb9w_rem-k9w",
   authDomain: "local-guru-aeac9.firebaseapp.com",
   databaseURL: "https://local-guru-aeac9.firebaseio.com",
@@ -10,7 +12,10 @@ var config = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
   storageBucket: "local-guru-aeac9.appspot.com",
   messagingSenderId: "337567241539"
 };
-var fire = firebase.initializeApp(config);
-export const auth = firebase.auth();
+
+firebase.initializeApp(config);
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+export const fbProvider = new firebase.auth.FacebookAuthProvider();
 export const db = firebase.firestore();
-export default fire;
+export const auth = firebase.auth();
+export const functions = firebase.functions();

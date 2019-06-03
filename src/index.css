@@ -23,6 +23,11 @@ code {
 
 }
 
+.InputContainer {
+  border: 1px solid rgba(0,0,0,0.12);
+  padding: 1rem;
+}
+
 .Polaris-Page {
   width: 85vw !important;
   max-width: none !important;
