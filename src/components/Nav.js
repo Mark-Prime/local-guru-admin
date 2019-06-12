@@ -53,6 +53,13 @@ class Nav extends Component {
               label: 'Account',
               icon: 'profile'
             },
+            {
+              label: 'Sign Out',
+              icon: 'logOut',
+              onClick: () => {
+                  this.props.logout()
+                }
+            }
         ]}
       />
     </Navigation>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { fetchTransactions } from '../../actions/TransactionActions'
-import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, FilterType, Layout, Avatar } from '@shopify/polaris'
+import { Page, Card, ResourceList, TextStyle, Pagination, Layout, Avatar } from '@shopify/polaris'
 import Moment from 'react-moment'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
@@ -79,7 +79,9 @@ class Orders extends Component {
       const { price, count, producer } = item.items[i]
 
       if(producer === this.props.user.uid){
-        total = total + price * count
+        return total = total + price * count
+      } else {
+        return false
       }
     })
 
@@ -90,10 +92,12 @@ class Orders extends Component {
     let list = [];
 
     Object.keys(item.items).map((i, index) => {
-      const { price, count, producer, title } = item.items[i]
+      const { count, producer, title } = item.items[i]
 
       if(producer === this.props.user.uid){
-        list[index] = `${title} x${count}`;
+        return list[index] = `${title} x${count}`;
+      } else {
+        return false
       }
     })
 
@@ -123,12 +127,12 @@ class Orders extends Component {
           // if the items already exists, add to it
           if(currentItem){
             const newCount = currentItem.count + transaction.items[item].count
-            currentUserOrder.items = {
+            return currentUserOrder.items = {
               ...currentUserOrder.items,
               [item]: { count: newCount  }
             }
           } else {
-            orders[uid].items[item] = transaction.items[item]
+            return orders[uid].items[item] = transaction.items[item]
           }
         })
 
@@ -143,8 +147,7 @@ class Orders extends Component {
   }
 
   renderItem = (item) => {
-    const {id, title, created_at, image, count, user} = item;
-    const media = <Thumbnail alt={title} source={image} />;
+    const {id, title, created_at, user} = item;
 
     return (
       <ResourceList.Item
@@ -170,21 +173,6 @@ class Orders extends Component {
       singular: 'order',
       plural: 'orders',
     };
-
-    const filters = [
-      {
-        key: 'collectionFilter',
-        label: 'Collection',
-        operatorText: 'is',
-        type: FilterType.Select,
-        options: ['Taste', 'Technology', 'Today', 'Tone', 'Tradition', 'Travel', 'Trend', 'Trust']
-      },
-      {
-        key: 'tagFilter',
-        label: 'Tagged with',
-        type: FilterType.TextField
-      },
-    ];
 
     return (
       <Page

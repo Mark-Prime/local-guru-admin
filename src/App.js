@@ -7,13 +7,14 @@ import Nav from './components/Nav'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Products from './pages/Products'
-import Login from './pages/Login'
+import Login from './components/Login'
+import Register from './pages/Register'
 import Orders from './pages/Orders'
 import EditSingleProduct from './pages/Products/Edit'
 import AddProduct from './pages/Products/AddProduct'
 import { toggleToast } from './actions/UIActions'
 import Settings from './pages/Settings'
-import { getProducer } from './actions/UserActions'
+import { getProducer, logoutUser } from './actions/UserActions'
 import { fetchTransactions } from './actions/TransactionActions'
 
 const { Section } = Layout;
@@ -30,25 +31,42 @@ class App extends Component {
     this.props.fetchTransactions(this.props.user.uid)
   }
 
+  componentDidUpdate(prevProps){
+    if(this.props.user.authenticated !== prevProps.user.authenticated){
+      this.props.getProducer()
+      this.props.fetchTransactions(this.props.user.uid)
+    }
+  }
+
   render() {
     return (
       <Frame>
-        <Wrapper>
-          <Nav />
-          <Layout>
-            <Section>
+        {this.props.user.uid
+          ?
+            <Wrapper>
+              <Nav logout={this.props.logoutUser} />
+              <Layout>
+                <Section>
+                  <Switch>
+                    <Route exact path='/' component={Home} />
+                    <Route path='/products/edit/:id' component={EditSingleProduct} />
+                    <Route path='/orders' component={Orders} />
+                    <Route path='/products/add' component={AddProduct} />
+                    <Route exact path='/products' component={Products} />
+                    <Route path='/account' component={Settings} />
+                    <Route path='/create-account' component={Register} />
+                  </Switch>
+                </Section>
+              </Layout>
+            </Wrapper>
+          :
+            <Layout>
               <Switch>
-                <Route exact path='/' component={Home} />
-                <Route path='/products/edit/:id' component={EditSingleProduct} />
-                <Route path='/orders' component={Orders} />
-                <Route path='/products/add' component={AddProduct} />
-                <Route exact path='/products' component={Products} />
-                <Route path='/account' component={Settings} />
-                <Route path='/login' component={Login} />
+                <Route exact path='/' component={Login} />
+                <Route path='/create-account' component={Register} />
               </Switch>
-            </Section>
-          </Layout>
-        </Wrapper>
+            </Layout>
+        }
         {this.props.ui.showToast
           ?
             <Toast content={this.props.ui.toastText} onDismiss={this.props.toggleToast} />
@@ -64,4 +82,4 @@ export default withRouter(connect((state, ownProps) => ({
   ui: state.ui,
   user: state.user,
   transactions: state.transactions
-}), { toggleToast, fetchTransactions, getProducer })(App));
+}), { toggleToast, fetchTransactions, getProducer, logoutUser })(App));

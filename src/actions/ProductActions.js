@@ -19,17 +19,18 @@ export function fetchAllProducts() {
   })
 }
 
-export function fetchUserProducts(user) {
-  console.log('user', user)
+export function fetchUserProducts(user){
   return dispatch => {
-    return db.collection('products').where(`producers.${user}.price`, '>', 0).get()
+    return db.collectionGroup('producers').where(`uid`, '==', user).get()
     .then(snapshot => {
       console.log(snapshot)
 
-      const products = {};
+      let products = [];
 
       snapshot.forEach((doc) => {
-        products[doc.id] = doc.data();
+        if(doc.data().price){
+          products = [doc.data(), ...products]
+        }
       })
 
        return dispatch({
@@ -92,16 +93,20 @@ export function fetchSingleProduct(id) {
   .then(doc => doc.data());
 }
 
-export function editProduct(user, id, values){
-  const name = `${user.name.first} ${user.name.last}`
-  const { photo,  uid} = user
-
+export function editProduct(user, id, values, image, title){
+  const name = `${user.displayName}`
+  const { photoURL,  uid} = user
+  console.log(values)
   const { description, price } = values;
   return db.collection('products').doc(id).collection('producers').doc(uid).set({
     [(name !== '') && 'name']: name,
-    [(photo !== '') && 'photo']: photo,
+    [(photoURL !== '') && 'photo']: photoURL,
     [(price !== '') && 'price']: Number(price),
+    [(uid) !== '' && 'uid']: uid,
     [(description !== '') && 'description']: description,
+    image: image,
+    product: id,
+    title: title
   },{ merge: true })
   .then(() => {
     return db.collection('products').doc(id).get()

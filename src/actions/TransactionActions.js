@@ -36,6 +36,8 @@ export function fetchEachTransaction(producer) {
 
           if(itemProducer === producer){
             return transactions[index] = { created_at: created_at, ...items[item]};
+          } else {
+            return false
           }
         })
       })

@@ -1,27 +1,27 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { CardElement } from 'react-stripe-elements'
-import { Tabs, Page, TextField, Card, Form, FormLayout, Layout, Scrollable, Button, Checkbox, ChoiceList, InlineError } from '@shopify/polaris'
-import AvatarUpload from '../components/AvatarUpload'
+import { Tabs, Page, TextField, Card, Form, FormLayout, Scrollable, Button, Checkbox, InlineError } from '@shopify/polaris'
 import { FaFacebookF, FaGoogle } from 'react-icons/fa'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { injectStripe } from 'react-stripe-elements'
-import { createAccount } from '../actions/UserActions'
+import { createAccount, loginUser } from '../actions/UserActions'
 import Survey from '../components/Survey'
 
 const Wrapper = styled.div`
-  width: 50vw;
+  margin-top: 4rem;
 
   .Polaris-Page {
   }
 `;
 
-class Login extends Component {
+class Register extends Component {
 
   state = {
     currentTab: 0,
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     passwordConfirm: '',
@@ -52,6 +52,7 @@ class Login extends Component {
 
   handleTabChange = (selectedTabIndex) => {
     const { currentTab } = this.state;
+    console.log('fired', currentTab)
 
     if(currentTab === 0){
       if(this.state.password === this.state.passwordConfirm){
@@ -59,25 +60,10 @@ class Login extends Component {
       } else {
         this.setState({ error: true, errorMessage: 'Passwords do not match' })
       }
-    }
-
-    if(currentTab === 1){
+    } else {
       this.setState({currentTab: selectedTabIndex});
     }
-
-    if(currentTab === 3 ){
-      this.setState({ currentTab: selectedTabIndex })
-    }
   };
-
-  // componentDidUpdate(prevProps, prevState){
-  //   if(prevState !== this.state){
-  //     const { name, street, zip, city, bio } = this.state;
-  //     if( name !== '' && street !== '' && zip !== '' && city !== '' && bio !== ''){
-  //       console.log('valid!')
-  //     }
-  //   }
-  // }
 
   handleCreateToken = (selectedTabIndex) => {
     const { stripe } = this.props;
@@ -98,6 +84,7 @@ class Login extends Component {
 
     this.props.createAccount(name, email, password, address, token)
     .then(() => {
+      this.props.loginUser()
       this.props.history.push('/')
     })
   }
@@ -108,13 +95,18 @@ class Login extends Component {
       {
         id: 'account',
         content:
-        <Card title='Account' sectioned primaryFooterAction={{content: 'Next', onAction: () => this.handleTabChange(this.state.currentTab + 1)}}>
+        <Card
+          title='Account'
+          sectioned
+          primaryFooterAction={{content: 'Next', onAction: () => this.handleTabChange(this.state.currentTab + 1)}}
+        >
             {this.state.error &&
               <InlineError message={this.state.errorMessage} fieldID="password" />
             }
             <Card.Section title='Signup with Email'>
               <FormLayout>
-                <TextField id='name' type='text' value={this.state.name} placeholder='Name' onChange={this.handleChange} />
+                <TextField id='firstName' type='text' value={this.state.firstName} placeholder='First name' onChange={this.handleChange} />
+                <TextField id='lastName' type='text' value={this.state.lastName} placeholder='Last name' onChange={this.handleChange} />
                 <TextField id='email' type='email' value={this.state.email} placeholder='Email' onChange={this.handleChange} />
                 <TextField id='password' type='password' value={this.state.password} placeholder='Password' onChange={this.handleChange} />
                 <TextField id='passwordConfirm' type='password' value={this.state.passwordConfirm} placeholder='Confirm password' onChange={this.handleChange} />
@@ -131,13 +123,21 @@ class Login extends Component {
       {
         id: 'survey',
         content:
-          <Survey handleSubmit={() => this.handleTabChange(2)} />
+          <Survey
+            handleSubmit={() => this.handleTabChange(2)}
+            back={ () => this.handleTabChange(this.state.currentTab - 1) }
+          />
       },
       {
         id: 'payment',
         content:
         <>
-          <Card title='Payment' sectioned primaryFooterAction={{content: 'Next', onAction: () => this.handleCreateToken(this.state.currentTab + 1)}}>
+          <Card
+            title='Payment'
+            sectioned
+            primaryFooterAction={{content: 'Next', onAction: () => this.handleCreateToken(this.state.currentTab + 1)}}
+            secondaryFooterAction={{ content: 'Back', onAction: () => this.handleTabChange(this.state.currentTab - 1) }}
+            >
             <Card.Section title='Address'>
             <FormLayout>
               <TextField id='name' type='text' value={this.state.name} placeholder='Name' onChange={this.handleChange} />
@@ -155,7 +155,12 @@ class Login extends Component {
       {
         id: 'terms',
         content:
-        <Card title='Terms of Service' sectioned primaryFooterAction={{content: 'Create Account', onAction: () => this.handleSubmit() }}>
+        <Card
+          title='Terms of Service'
+          sectioned
+          primaryFooterAction={{content: 'Create Account', onAction: () => this.handleSubmit() }}
+          secondaryFooterAction={{ content: 'Back', onAction: () => this.handleTabChange(this.state.currentTab - 1) }}
+        >
         <FormLayout>
            <Scrollable shadow style={{height: '100px'}}>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam dictum enim a nunc commodo egestas. Duis bibendum tellus et elit porta placerat. Maecenas eget ante semper, vulputate nulla non, pellentesque ligula. Quisque posuere quam neque, a gravida leo dignissim non. Suspendisse scelerisque venenatis ante, non elementum nibh. Fusce accumsan efficitur ex, id scelerisque metus porta ut. Suspendisse tincidunt augue non consequat fermentum. Vivamus magna augue, ornare at lectus ac, tristique laoreet est. Vivamus id nulla in elit suscipit elementum in sed nisl. Donec interdum vestibulum urna, sit amet porttitor dui malesuada et. Fusce eu nulla a tortor porta aliquam non vitae erat. Aliquam quis molestie ex, eget commodo ligula. Vivamus maximus lorem in elit auctor, eget hendrerit ipsum tincidunt. Nam sit amet mattis tortor, quis bibendum tellus. Morbi aliquam neque et augue sollicitudin ultricies.</p>
@@ -211,4 +216,4 @@ class Login extends Component {
 export default injectStripe(withRouter(connect((state, ownProps) => ({
   ui: state.ui,
   user: state.user,
-}), { createAccount })(Login)));
+}), { createAccount, loginUser })(Register)));

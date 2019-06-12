@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { fetchUserProducts } from '../../actions/ProductActions'
-import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, FilterType } from '@shopify/polaris'
+import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, CalloutCard } from '@shopify/polaris'
 import Moment from 'react-moment'
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -92,14 +91,14 @@ class Products extends Component {
   }
 
   renderItem = (item) => {
-    const {id, title, created_at, image} = item;
+    const {product, title, created_at, image} = item;
     const media = <Thumbnail alt={title} source={image} />;
 
     return (
       <ResourceList.Item
-        id={id}
-        url={`/product/edit/${id}`}
+        id={created_at}
         media={media}
+        url={`/product/edit/${product}`}
         accessibilityLabel={`View details for ${title}`}
       >
         <h3>
@@ -124,46 +123,6 @@ class Products extends Component {
       },
     ];
 
-    const bulkActions = [
-      {
-        content: 'Add tags',
-        onAction: () => this.handleModalToggle('addTags'),
-      },
-      {
-        content: 'Remove tags',
-        onAction: () => console.log('Todo: implement bulk remove tags'),
-      },
-      {
-        content: 'Delete products',
-        onAction: () => this.handleModalToggle('deleteProduct'),
-      },
-    ];
-
-    const filters = [
-      {
-        key: 'collectionFilter',
-        label: 'Collection',
-        operatorText: 'is',
-        type: FilterType.Select,
-        options: ['Taste', 'Technology', 'Today', 'Tone', 'Tradition', 'Travel', 'Trend', 'Trust']
-      },
-      {
-        key: 'tagFilter',
-        label: 'Tagged with',
-        type: FilterType.TextField
-      },
-    ];
-
-    const filterControl = (
-      <ResourceList.FilterControl
-        filters={filters}
-        appliedFilters={this.state.appliedFilters}
-        onFiltersChange={this.handleFiltersChange}
-        searchValue={this.state.searchValue}
-        onSearchChange={this.handleSearchChange}
-      />
-    );
-
     return (
       <Page
         title='Products'
@@ -172,35 +131,46 @@ class Products extends Component {
         <Card>
           {this.state.isLoaded
             ?
-            <>
-              <ResourceList
-                resourceName={resourceName}
-                items={Object.values(this.props.products)}
-                renderItem={this.renderItem}
-                selectedItems={this.state.selectedItems}
-                onSelectionChange={this.handleSelectionChange}
-                promotedBulkActions={promotedBulkActions}
-                bulkActions={bulkActions}
-                filterControl={filterControl}
-              />
-              {Object.keys(this.props.products).length > 49
-                ?
-                  <PaginationFooter>
-                    <Pagination
-                        hasPrevious={this.state.page > 1}
-                        previousKeys={[74]}
-                        previousTooltip="j"
-                        onPrevious={this.onPrev}
-                        hasNext
-                        nextKeys={[75]}
-                        nextTooltip="k"
-                        onNext={this.onNext}
-                    />
-                  </PaginationFooter>
-                :
-                  null
-              }
-            </>
+              this.props.products.length > 0
+              ?
+                <>
+                  <ResourceList
+                    resourceName={resourceName}
+                    items={Object.values(this.props.products)}
+                    renderItem={this.renderItem}
+                    selectedItems={this.state.selectedItems}
+                    onSelectionChange={this.handleSelectionChange}
+                    promotedBulkActions={promotedBulkActions}
+                  />
+                  {this.props.products.length > 49
+                    ?
+                      <PaginationFooter>
+                        <Pagination
+                            hasPrevious={this.state.page > 1}
+                            previousKeys={[74]}
+                            previousTooltip="j"
+                            onPrevious={this.onPrev}
+                            hasNext
+                            nextKeys={[75]}
+                            nextTooltip="k"
+                            onNext={this.onNext}
+                        />
+                      </PaginationFooter>
+                    :
+                      null
+                  }
+                </>
+              :
+              <CalloutCard
+                title="Add new products to your shop"
+                illustration="https://cdn.shopify.com/s/assets/admin/checkout/settings-customizecart-705f57c725ac05be5a34ec20c05b94298cb8afd10aac7bd9c7ad02030f48cfa0.svg"
+                primaryAction={{
+                  content: 'Add new product',
+                  url: '/products/add',
+                }}
+              >
+                <p>Add a new product for sale on your shop.</p>
+              </CalloutCard>
             :
               null
           }
@@ -214,7 +184,6 @@ Products.propTypes = {
   user: PropTypes.object.isRequired,
   products: PropTypes.object.isRequired,
   fetchUserProducts: PropTypes.func.isRequired,
-  fetchProducts: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired
 }
 

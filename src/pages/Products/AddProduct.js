@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Page, Layout, Card, Autocomplete } from '@shopify/polaris'
+import { Page, Layout, Card } from '@shopify/polaris'
 import { fetchAllProducts, editProduct, fetchSingleProduct } from '../../actions/ProductActions'
 import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
@@ -60,18 +60,19 @@ class AddProduct extends Component {
 
   handleCurrencyBlur = () => {
     const price = Number(this.state.values.price).toFixed(2)
-    this.setState({ values: { ... this.state.values, price: price } })
+    this.setState({ values: { ...this.state.values, price: price } })
   }
 
   handleSubmit = () => {
     const { selected, values } = this.state;
     const { user } = this.props;
-    editProduct(user, selected, values)
+    const { image, title } = this.state.products[selected];
+    editProduct(user, selected, values, image, title)
     .then(() => {
-      fetchSingleProduct(selected).then(photo => {
+      fetchSingleProduct(selected).then(product => {
         this.setState({
-            photo: photo,
-            values: photo,
+            product: product,
+            values: product,
             isLoaded: true,
             touched: false
           })
@@ -91,8 +92,8 @@ class AddProduct extends Component {
 
   render() {
 
-    const { isLoaded, photo, touched, values, selected, products } = this.state;
-    const { price, description } = values;
+    const { touched, values, selected, products } = this.state;
+    const { price } = values;
 
     return (
       <Page

@@ -1,10 +1,21 @@
 import React, { Component } from 'react'
+import styled from 'styled-components';
 import { DropZone, Stack, Thumbnail, Caption } from '@shopify/polaris'
+
+const Wrapper = styled.div`
+  width: 200px;
+`;
 
 class AvatarUpload extends Component {
 
   state = {
     files: [],
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if(this.state.files !== prevState.files){
+      this.props.onChange(this.state.files[0])
+    }
   }
 
   render() {
@@ -34,15 +45,18 @@ class AvatarUpload extends Component {
     );
 
     return (
-      <DropZone
-        label={this.props.label}
-        onDrop={(files, acceptedFiles, rejectedFiles) => {
-          this.setState({files: [...this.state.files, ...acceptedFiles]});
-        }}
-      >
-        {uploadedFiles}
-        {fileUpload}
-      </DropZone>
+      <Wrapper>
+        <DropZone
+          label='Profile photo'
+          allowMultiple={false}
+          onDrop={(files, acceptedFiles, rejectedFiles) => {
+            this.setState({files: [...this.state.files, ...acceptedFiles]});
+          }}
+        >
+          {uploadedFiles}
+          {fileUpload}
+        </DropZone>
+      </Wrapper>
     );
   }
 }

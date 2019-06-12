@@ -62,15 +62,16 @@ class EditSingleProduct extends Component {
 
   handleCurrencyBlur = () => {
     const price = Number(this.state.values.price).toFixed(2)
-    this.setState({ values: { ... this.state.values, price: price } })
+    this.setState({ values: { ...this.state.values, price: price } })
   }
 
   handleSubmit = () => {
     const { values } = this.state;
     const { user } = this.props;
     const { id } = this.props.match.params;
+    const { title } = this.state.products[this.state.selected]
 
-    editProduct(user, id, values)
+    editProduct(user, id, values, title)
     .then(() => {
       fetchSingleProduct(id).then(photo => {
         this.setState({ photo: photo, values: photo, isLoaded: true, touched: false })
@@ -90,8 +91,8 @@ class EditSingleProduct extends Component {
 
   render() {
 
-    const { isLoaded, photo, touched, values, selected, products } = this.state;
-    const { price, description } = values;
+    const { touched, values, selected, products } = this.state;
+    const { price } = values;
 
     return (
       <Page

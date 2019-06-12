@@ -11,10 +11,12 @@ const getOverview = (orders, user) => {
       const { count, price, title, image, producer, unit } = order.items[item]
       if(producer === user){
         if(items[item]){
-          items[item] = {...items[item], count: count + items[item].count}
+        return  items[item] = {...items[item], count: count + items[item].count}
         } else {
-          items[item] = {count: count, price: price, title: title, image: image, unit: unit}
+        return  items[item] = {count: count, price: price, title: title, image: image, unit: unit}
         }
+      } else {
+        return false
       }
     })
   })

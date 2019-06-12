@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toggleToast } from '../actions/UIActions'
 import { fetchEachTransaction } from '../actions/TransactionActions'
-import { Page, DisplayText, TextStyle, Layout, CalloutCard } from '@shopify/polaris'
+import { DisplayText, Layout } from '@shopify/polaris'
 
 const { Section } = Layout
 
@@ -25,11 +25,13 @@ class OrderPreview extends Component {
     let amount = 0;
 
     if(this.state.transactions.length > 0){
-      this.state.transactions.map(item => {
+      return this.state.transactions.map(item => {
         const { created_at } = item;
         const today = Date.now();
         if(today - created_at <= 86400000 * 7 ){
-          amount = amount + item.price * item.count
+          return amount = amount + item.price * item.count
+        } else {
+          return false
         }
       })
     }

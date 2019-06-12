@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { addBankAccount, addPayoutCard } from '../actions/UserActions'
+import { addBankAccount, addPayoutCard, editProfile } from '../actions/UserActions'
 import { toggleToast } from '../actions/UIActions'
+import AvatarUpload from '../components/AvatarUpload'
 import { injectStripe, CardElement } from 'react-stripe-elements'
-import { Page, Layout, Card, TextField, FormLayout, Button, SkeletonDisplayText } from '@shopify/polaris'
+import { Thumbnail, Page, Layout, Card, TextField, FormLayout, Button } from '@shopify/polaris'
 
 const { Section } = Layout
 
@@ -17,7 +18,21 @@ class Settings extends Component {
   state = {
     routing: '',
     account: '',
-    formOpen: false
+    formOpen: false,
+    bio: '',
+    photo: '',
+    dropzoneOpen: false
+  }
+
+  componentDidUpdate(prevProps){
+    if(this.props.user !== prevProps.user){
+      console.log(this.props.user.bio)
+      if(this.props.user.bio){
+        this.setState({
+          bio: this.props.user.bio
+        })
+      }
+    }
   }
 
   handleAddBank = () => {
@@ -46,7 +61,6 @@ class Settings extends Component {
     e.preventDefault()
 
     const { user, stripe } = this.props;
-    const { routing, account } = this.state;
 
     stripe.createToken({type: 'card', name: this.props.user.displayName, currency: 'usd'})
     .then(({error, token}) => {
@@ -71,22 +85,53 @@ class Settings extends Component {
     this.setState({ formOpen: !this.state.formOpen })
   }
 
+  handleEditProfile = () => {
+    const user = this.props.user.uid;
+    const { bio, photo } = this.state;
+    this.props.editProfile(user, bio, photo)
+    .then(res => {
+      this.props.toggleToast('Profile updated')
+    })
+    .catch(err => {
+      this.props.toggleToast(err.message)
+    })
+  }
+
+  handleUpload = (file) => {
+    this.setState({ photo: file })
+  }
+
   render(){
     return (
       <div>
         <Page title='Account Settings'>
           <Layout>
             <Section>
-            <Card title='Profile' sectioned>
+            <Card title='Profile' sectioned primaryFooterAction={{ content: 'Update profile', onAction: () => this.handleEditProfile()}}>
+              <FormLayout>
+                <TextField id='bio' value={this.state.bio} label='Bio' onChange={this.handleChange} />
+                {this.state.dropzoneOpen
+                  ?
+                    <div>
+                      <p><AvatarUpload onChange={this.handleUpload}/></p><br/>
+                      <p><Button plain onClick={() => this.setState({ dropzoneOpen: false })}>Cancel</Button></p>
+                    </div>
+                  :
+                    <div>
+                      <p><Thumbnail size='large' source={this.props.user.photoURL} /></p><br/>
+                      <p><Button plain onClick={() => this.setState({ dropzoneOpen: true })}>Change image</Button></p>
+                    </div>
+                }
+              </FormLayout>
             </Card>
             <Card title='Password' sectioned>
             </Card>
             <Card title='Debit Card for Payout' sectioned>
-            {this.props.user.bankAccount
+            {this.props.user.token
               &&
 
-                <Card title={this.props.user.card.brand} sectioned>
-                   •••• {this.props.user.card.last4}
+                <Card title={this.props.user.token.card.brand} sectioned>
+                   •••• {this.props.user.token.card.last4}
                 </Card>
 
             }
@@ -152,4 +197,4 @@ class Settings extends Component {
 
 export default injectStripe(connect((state, ownProps) => ({
   user: state.user
-}), { addBankAccount, addPayoutCard, toggleToast })(Settings));
+}), { addBankAccount, addPayoutCard, toggleToast, editProfile })(Settings));
