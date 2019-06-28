@@ -1,3 +1,4 @@
+/* global Stripe */
 import { auth, db , functions, storage } from '../firebase'
 
 export const LOGIN_USER = 'login_user'
@@ -111,6 +112,8 @@ export function editProfile(user, bio, photo){
 }
 
 export function createAccount(name, email, password, address, token){
+  console.log('name', name)
+  console.log('email', email)
   return dispatch => {
     return auth.createUserWithEmailAndPassword(email, password)
     .then(res => {
@@ -120,7 +123,8 @@ export function createAccount(name, email, password, address, token){
         displayName: name,
         uid: uid,
         address: address,
-        token: token.token
+        token: token.token,
+        email: email
       }, { merge: true })
     })
     .catch(error => {

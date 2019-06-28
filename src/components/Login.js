@@ -12,7 +12,7 @@ const Wrapper = styled.div`
     text-align: center;
 
     a {
-      text-decoration: none; 
+      text-decoration: none;
     }
   }
 `;

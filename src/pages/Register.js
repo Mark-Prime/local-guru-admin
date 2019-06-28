@@ -8,6 +8,9 @@ import { connect } from 'react-redux'
 import { injectStripe } from 'react-stripe-elements'
 import { createAccount, loginUser } from '../actions/UserActions'
 import Survey from '../components/Survey'
+import { firebase } from '@firebase/app'
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
+import { auth } from '../firebase'
 
 const Wrapper = styled.div`
   margin-top: 4rem;
@@ -74,6 +77,33 @@ class Register extends Component {
     })
   }
 
+  uiConfig = {
+    // Popup signin flow rather than redirect flow.
+    signInFlow: 'popup',
+    // We will display Google and Facebook as auth providers.
+    signInOptions: [
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      firebase.auth.FacebookAuthProvider.PROVIDER_ID
+    ],
+    tosUrl: 'https://local-guru-admin.netlify/terms' ,
+    privacyPolicyUrl: 'https://local-guru-admin.netlify/privacy-policy',
+    callbacks: {
+        // Avoid redirects after sign-in.
+        signInSuccessWithAuthResult: (res) => {
+          const { email, uid, displayName, photoURL } = res.user;
+          const firstName = displayName.split(' ')[0];
+          const lastName = displayName.split(' ')[1]
+
+          this.setState({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            currentTab: this.state.currentTab + 1
+          })
+        }
+      }
+  };
+
   handleSubmit = () => {
     const { name, email, password, token } = this.state;
     const address = {
@@ -114,8 +144,7 @@ class Register extends Component {
             </Card.Section>
             <Card.Section title='or Signup with Google / Facebook'>
               <FormLayout>
-                <Button outline size='large' icon={<FaGoogle style={{ color: '#db3236' }} />}>Signup with Google</Button>
-                <Button outline size='large' icon={<FaFacebookF style={{ color: '#3C5A99' }} />}>Signup with Facebook</Button>
+                <StyledFirebaseAuth uiConfig={this.uiConfig} firebaseAuth={auth}/>
               </FormLayout>
             </Card.Section>
         </Card>
