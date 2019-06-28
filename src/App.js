@@ -11,7 +11,7 @@ import Login from './components/Login'
 import Register from './pages/Register'
 import Orders from './pages/Orders'
 import EditSingleProduct from './pages/Products/Edit'
-import AddProduct from './pages/Products/AddProduct'
+import AddSingleProduct from './pages/Products/AddSingleProduct'
 import { toggleToast } from './actions/UIActions'
 import Settings from './pages/Settings'
 import { getProducer, logoutUser } from './actions/UserActions'
@@ -49,9 +49,9 @@ class App extends Component {
                 <Section>
                   <Switch>
                     <Route exact path='/' component={Home} />
-                    <Route path='/products/edit/:id' component={EditSingleProduct} />
+                    <Route path='/product/edit/:id' component={EditSingleProduct} />
                     <Route path='/orders' component={Orders} />
-                    <Route path='/products/add' component={AddProduct} />
+                    <Route path='/products/add' component={AddSingleProduct} />
                     <Route exact path='/products' component={Products} />
                     <Route path='/account' component={Settings} />
                     <Route path='/create-account' component={Register} />

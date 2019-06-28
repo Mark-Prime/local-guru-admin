@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Page, Layout, Card } from '@shopify/polaris'
-import { editProduct, fetchSingleProduct } from '../../actions/ProductActions'
+import { fetchAllProducts, editProduct, fetchSingleProducerProduct } from '../../actions/ProductActions'
 import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
 import EditProduct from '../../components/EditProduct'
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
 
 const Image = styled.div`
   img {
@@ -17,33 +18,28 @@ class EditSingleProduct extends Component {
 
   state = {
     isLoaded: false,
-    values: {
-      description: '',
-      price: 0,
-      unit: ''
-    },
-    inputText: '',
     touched: false,
+    product: {},
+    unit: 'oz'
   }
 
   componentDidMount(){
     const { id } = this.props.match.params;
-    fetchSingleProduct(id)
+    fetchSingleProducerProduct(id, this.props.user.uid)
     .then(product => {
-      const { description, image, price, unit, title } = product;
-      this.setState({ values: {
-        description: description,
-        price: price,
-        unit: unit,
-        image: image,
-        title: title
-      } })
+      console.log(product.unit)
+      this.setState({ product: product, unit: product.unit })
     })
   }
 
+  handleProductChoice = (selected) => {
+    this.setState({ selected: selected[0] })
+  }
+
   handleChangeTextField = (value, id) => {
+    console.log(value)
     this.setState({ touched: true })
-    this.setState({ values: { ...this.state.values, [id]: value }})
+    this.setState({ product: {...this.state.product, [id]: value} })
   }
 
   updateText = (newValue) => {
@@ -51,30 +47,38 @@ class EditSingleProduct extends Component {
      this.filterAndUpdateOptions(newValue);
    };
 
-  handleSelectChange = (value, id) => {
-    this.setState({ touched: true })
-    this.setState({ values: { ...this.state.values, [id]: value} })
-  }
-
   handleFocus = (e) => {
     e.target.select()
   }
 
   handleCurrencyBlur = () => {
-    const price = Number(this.state.values.price).toFixed(2)
-    this.setState({ values: { ...this.state.values, price: price } })
+    const price = Number(this.state.product.price).toFixed(2)
+    this.setState({ product: {...this.state.product, price: price} })
+  }
+
+  handleUnitChange = (unit) => {
+    this.setState({ unit: unit, touched: true })
   }
 
   handleSubmit = () => {
-    const { values } = this.state;
+    const { selected, product, unit } = this.state;
     const { user } = this.props;
+    const { image, title, description, price } = product;
     const { id } = this.props.match.params;
-    const { title } = this.state.products[this.state.selected]
 
-    editProduct(user, id, values, title)
+    const values = {
+      description: description,
+      price: price
+    }
+
+    editProduct(user, id, values, image, title, unit)
     .then(() => {
-      fetchSingleProduct(id).then(photo => {
-        this.setState({ photo: photo, values: photo, isLoaded: true, touched: false })
+      fetchSingleProducerProduct(id, this.props.user.uid).then(product => {
+        this.setState({
+            product: product,
+            isLoaded: true,
+            touched: false
+          })
       })
     })
     .then(() => {
@@ -91,28 +95,24 @@ class EditSingleProduct extends Component {
 
   render() {
 
-    const { touched, values, selected, products } = this.state;
-    const { price } = values;
+    const { touched, unit } = this.state;
+    const { title, description, image, photo, price } = this.state.product;
 
     return (
       <Page
         breadcrumbs={[{content: 'Products', onAction: this.goBack}]}
-        title='Add Product'
+        title={title}
         primaryAction={{ content: 'Save', disabled: !touched, onAction: this.handleSubmit }}
       >
         <Layout>
           <Layout.Section>
             <EditProduct
-              edit
-              products={products}
-              title={this.state.values.title}
-              selected={selected}
-              description={values.description}
+              title={title}
+              description={description}
               price={price}
-              unit={this.state.values.unit}
-              handleProductChoice={this.handleProductChoice}
+              unit={unit}
+              handleUnitChange={this.handleUnitChange}
               handleChangeTextField={this.handleChangeTextField}
-              handleSelectChange={this.handleSelectChange}
               handleFocus={this.handleFocus}
               handleCurrencyBlur={this.handleCurrencyBlur}
             />
@@ -120,12 +120,7 @@ class EditSingleProduct extends Component {
           <Layout.Section secondary>
             <Card sectioned>
               <Image>
-                {selected !== ''
-                  ?
-                    <img src={this.state.values.image} alt={this.state.title} />
-                  :
-                    null
-                }
+                <img src={image} alt={title} />
               </Image>
             </Card>
           </Layout.Section>
@@ -133,7 +128,11 @@ class EditSingleProduct extends Component {
       </Page>
     );
   }
+}
 
+EditSingleProduct.propTypes = {
+  user: PropTypes.object.isRequired,
+  toggleToast: PropTypes.func.isRequired
 }
 
 export default withRouter(connect((state, ownProps) => ({

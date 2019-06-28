@@ -4,7 +4,7 @@ import { Page, Layout, Card } from '@shopify/polaris'
 import { fetchAllProducts, editProduct, fetchSingleProduct } from '../../actions/ProductActions'
 import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
-import EditProduct from '../../components/EditProduct'
+import AddProduct from '../../components/AddProduct'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
@@ -14,7 +14,7 @@ const Image = styled.div`
   }
 `;
 
-class AddProduct extends Component {
+class AddSingleProduct extends Component {
 
   state = {
     isLoaded: false,
@@ -22,6 +22,7 @@ class AddProduct extends Component {
       description: '',
       price: 0
     },
+    title: '',
     selected: '',
     inputText: '',
     products: {},
@@ -40,6 +41,7 @@ class AddProduct extends Component {
   }
 
   handleChangeTextField = (value, id) => {
+    console.log(value, id)
     this.setState({ touched: true })
     this.setState({ values: { ...this.state.values, [id]: value }})
   }
@@ -66,8 +68,8 @@ class AddProduct extends Component {
   handleSubmit = () => {
     const { selected, values } = this.state;
     const { user } = this.props;
-    const { image, title } = this.state.products[selected];
-    editProduct(user, selected, values, image, title)
+    const { image, title, unit } = this.state.products[selected];
+    editProduct(user, selected, values, image, title, unit)
     .then(() => {
       fetchSingleProduct(selected).then(product => {
         this.setState({
@@ -92,7 +94,7 @@ class AddProduct extends Component {
 
   render() {
 
-    const { touched, values, selected, products } = this.state;
+    const { touched, values, selected, products, title } = this.state;
     const { price } = values;
 
     return (
@@ -103,9 +105,9 @@ class AddProduct extends Component {
       >
         <Layout>
           <Layout.Section>
-            <EditProduct
+            <AddProduct
               products={products}
-              title={selected !== '' ? products[selected].title : ''}
+              title={title}
               selected={selected}
               description={values.description}
               price={price}
@@ -135,11 +137,11 @@ class AddProduct extends Component {
   }
 }
 
-AddProduct.propTypes = {
+AddSingleProduct.propTypes = {
   user: PropTypes.object.isRequired,
   toggleToast: PropTypes.func.isRequired
 }
 
 export default withRouter(connect((state, ownProps) => ({
   user: state.user
-}), { toggleToast })(AddProduct));
+}), { toggleToast })(AddSingleProduct));

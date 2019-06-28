@@ -6,8 +6,10 @@ export const FETCH_TAGGED_PRODUCTS = 'fetch_tagged_products';
 export const FETCH_CATEGORY = 'fetch_category';
 
 export function fetchAllProducts() {
-  return db.collection('products').get()
+  return db.collection('products').orderBy('title', 'asc').get()
   .then(snapshot => {
+
+    console.log(snapshot)
 
     const products = {};
 
@@ -93,9 +95,16 @@ export function fetchSingleProduct(id) {
   .then(doc => doc.data());
 }
 
-export function editProduct(user, id, values, image, title){
+export function fetchSingleProducerProduct(id, uid) {
+  return db.collection('products').doc(id).collection('producers').doc(uid).get()
+  .then(doc => doc.data());
+}
+
+export function editProduct(user, id, values, image, title, unit){
+  console.log('user', user)
+  console.log('id', id)
   const name = `${user.displayName}`
-  const { photoURL,  uid} = user
+  const { photoURL,  uid} = user;
   console.log(values)
   const { description, price } = values;
   return db.collection('products').doc(id).collection('producers').doc(uid).set({
@@ -106,18 +115,23 @@ export function editProduct(user, id, values, image, title){
     [(description !== '') && 'description']: description,
     image: image,
     product: id,
-    title: title
+    title: title,
+    unit: unit
   },{ merge: true })
   .then(() => {
+    console.log(id)
     return db.collection('products').doc(id).get()
   })
   .then(product => {
+    console.log(product.data())
     if(product.data().producers && typeof product.data().producers.user === 'undefined'){
       const { producers } = product.data()
 
       return db.collection('products').doc(id).set({
         producers: { [uid]: price, ...producers }
       }, { merge: true } )
+    } else {
+      console.log('hey')
     }
   })
 }
