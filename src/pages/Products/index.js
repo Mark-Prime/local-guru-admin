@@ -104,7 +104,6 @@ class Products extends Component {
         <h3>
           <TextStyle variation="strong">{title}</TextStyle>
         </h3>
-        <Date>Published on <Moment format='MMMM Do, YYYY'>{created_at}</Moment></Date>
       </ResourceList.Item>
     );
   };
