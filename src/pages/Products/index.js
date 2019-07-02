@@ -135,7 +135,7 @@ class Products extends Component {
                 <>
                   <ResourceList
                     resourceName={resourceName}
-                    items={Object.values(this.props.products)}
+                    items={this.props.products}
                     renderItem={this.renderItem}
                     selectedItems={this.state.selectedItems}
                     onSelectionChange={this.handleSelectionChange}
@@ -181,7 +181,7 @@ class Products extends Component {
 
 Products.propTypes = {
   user: PropTypes.object.isRequired,
-  products: PropTypes.object.isRequired,
+  products: PropTypes.array.isRequired,
   fetchUserProducts: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired
 }

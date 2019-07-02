@@ -32,12 +32,14 @@ class AddSingleProduct extends Component {
   componentDidMount(){
     fetchAllProducts()
     .then(products => {
+      console.log(products)
       this.setState({ products: products })
     })
   }
 
   handleProductChoice = (selected) => {
-    this.setState({ selected: selected[0] })
+    let index = this.state.products.findIndex(p => p.title == selected)
+    this.setState({ selected: index })
   }
 
   handleChangeTextField = (value, id) => {
@@ -68,10 +70,11 @@ class AddSingleProduct extends Component {
   handleSubmit = () => {
     const { selected, values } = this.state;
     const { user } = this.props;
-    const { image, title, unit } = this.state.products[selected];
-    editProduct(user, selected, values, image, title, unit)
+    const { image, title, unit, id } = this.state.products[selected];
+    console.log(id)
+    editProduct(user, id, values, image, title, unit)
     .then(() => {
-      fetchSingleProduct(selected).then(product => {
+      fetchSingleProduct(id).then(product => {
         this.setState({
             product: product,
             values: product,

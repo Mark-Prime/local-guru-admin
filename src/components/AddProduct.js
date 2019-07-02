@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Card, Form, FormLayout, TextField, Autocomplete, Icon } from '@shopify/polaris';
 import PropTypes from 'prop-types';
+import ProductSearch from './ProductSearch'
 
 class AddProduct extends Component {
 
@@ -11,26 +12,6 @@ class AddProduct extends Component {
   render() {
 
     const { edit, title, unit, products, price, description, selected, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
-    const textField = (
-      <Autocomplete.TextField
-        onChange={this.props.handleChangeTextField}
-        label="Product"
-        value={title}
-        autoComplete="autocomplete_off_hack_xfr4!k"
-        prefix={<Icon source="search" color="inkLighter" />}
-        placeholder="Search"
-      />
-    )
-
-    let titleOptions = [];
-
-    if(!edit){
-      Object.keys(products).map((product, index) => {
-        titleOptions[index] = { value: product, label: products[product].title }
-      })
-    }
-
-    titleOptions.sort((a, b) => a.label - b.label)
 
     return (
       <Card>
@@ -38,11 +19,9 @@ class AddProduct extends Component {
           <Card.Section>
             <FormLayout>
               {!edit &&
-                <Autocomplete
-                  options={titleOptions}
-                  selected={selected}
+                <ProductSearch
+                  selected={this.state.selected}
                   onSelect={handleProductChoice}
-                  textField={textField}
                 />
               }
               <TextField
@@ -85,10 +64,10 @@ AddProduct.propTypes = {
   title: PropTypes.string,
   edit: PropTypes.bool,
   unit: PropTypes.string.isRequired,
-  products: PropTypes.object.isRequired,
+  products: PropTypes.array.isRequired,
   price: PropTypes.number.isRequired,
   description: PropTypes.string.isRequired,
-  selected: PropTypes.string.isRequired,
+  selected: PropTypes.number.isRequired,
   handleProductChoice: PropTypes.func.isRequired,
   handleFocus: PropTypes.func.isRequired,
   handleChangeTextField: PropTypes.func.isRequired,

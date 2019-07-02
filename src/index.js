@@ -10,6 +10,13 @@ import reducers from './reducers'
 import { StripeProvider, Elements } from 'react-stripe-elements'
 import { Provider } from 'react-redux'
 import { AppProvider } from '@shopify/polaris'
+import algoliasearch from 'algoliasearch/lite';
+import { InstantSearch } from 'react-instantsearch-dom'
+
+const searchClient = algoliasearch(
+  'VLXSKNYQRF',
+  '88d8816875da387bcb87952abcdc719f'
+);
 
 const store = createStore(
   reducers,
@@ -23,9 +30,14 @@ ReactDOM.render(
     <StripeProvider apiKey="pk_test_cYlKdbvRzgYVBKgtXVlg4UPE">
       <Elements>
       <AppProvider>
+      <InstantSearch
+        indexName="products"
+        searchClient={searchClient}
+      >
         <Router>
           <App />
         </Router>
+      </InstantSearch>
       </AppProvider>
       </Elements>
     </StripeProvider>

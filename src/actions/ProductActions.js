@@ -9,12 +9,10 @@ export function fetchAllProducts() {
   return db.collection('products').orderBy('title', 'asc').get()
   .then(snapshot => {
 
-    console.log(snapshot)
+    let products = [];
 
-    const products = {};
-
-    snapshot.forEach((doc) => {
-      products[doc.id] = doc.data();
+    snapshot.forEach((doc, index) => {
+      products = [doc.data(), ...products]
     })
 
      return products;
@@ -25,7 +23,6 @@ export function fetchUserProducts(user){
   return dispatch => {
     return db.collectionGroup('producers').where(`uid`, '==', user).get()
     .then(snapshot => {
-      console.log(snapshot)
 
       let products = [];
 
@@ -34,6 +31,8 @@ export function fetchUserProducts(user){
           products = [doc.data(), ...products]
         }
       })
+
+      console.log(products)
 
        return dispatch({
         type: FETCH_USER_PRODUCTS,
