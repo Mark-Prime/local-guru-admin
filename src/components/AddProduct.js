@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Form, FormLayout, TextField, Autocomplete, Icon } from '@shopify/polaris';
+import { Card, Form, FormLayout, TextField, Select } from '@shopify/polaris';
 import PropTypes from 'prop-types';
 import ProductSearch from './ProductSearch'
 
@@ -11,12 +11,12 @@ class AddProduct extends Component {
 
   render() {
 
-    const { edit, title, unit, products, price, description, selected, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
+    const { edit, unit, price, description, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
 
     return (
-      <Card>
+      <Card secondaryFooterActions={[{content: 'Add unit'}]}>
         <Form onSubmit={this.handleSubmit}>
-          <Card.Section>
+          <Card.Section title='Product'>
             <FormLayout>
               {!edit &&
                 <ProductSearch
@@ -30,8 +30,11 @@ class AddProduct extends Component {
                 label='Description'
                 onChange={handleChangeTextField}
               />
+            </FormLayout>
+            </Card.Section>
+            <Card.Section title='Prices'>
+            <FormLayout>
               <TextField
-                label="Price"
                 type="number"
                 id="price"
                 onFocus={handleFocus}
@@ -39,17 +42,22 @@ class AddProduct extends Component {
                 value={price}
                 helpText={`You will receive $${(price*.8).toFixed(2)} per ${unit} after fees`}
                 onChange={handleChangeTextField}
+                connectedRight={
+                  <Select label="Weight unit" labelHidden value='lb' options={['oz', 'lb', 'bunch', 'each']} />
+                }
                 prefix="$"
               />
-            </FormLayout>
-          </Card.Section>
-          <Card.Section>
-            <FormLayout>
               <TextField
-                value={unit}
-                id='unit'
-                label='Unit'
-                disabled
+                type="number"
+                id="price"
+                onFocus={handleFocus}
+                onBlur={handleCurrencyBlur}
+                value='1.00'
+                helpText={`You will receive $${(1*.8).toFixed(2)} per ${unit} after fees`}
+                connectedRight={
+                  <Select label="Weight unit" labelHidden value='each' options={['oz', 'lb', 'bunch', 'each']} />
+                }
+                prefix="$"
               />
             </FormLayout>
           </Card.Section>

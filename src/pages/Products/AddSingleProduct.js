@@ -22,6 +22,7 @@ class AddSingleProduct extends Component {
       description: '',
       price: 0
     },
+    units: [],
     title: '',
     selected: '',
     inputText: '',
@@ -38,7 +39,7 @@ class AddSingleProduct extends Component {
   }
 
   handleProductChoice = (selected) => {
-    let index = this.state.products.findIndex(p => p.title == selected)
+    let index = this.state.products.findIndex(p => p.title === selected)
     this.setState({ selected: index })
   }
 
@@ -76,11 +77,11 @@ class AddSingleProduct extends Component {
     .then(() => {
       fetchSingleProduct(id).then(product => {
         this.setState({
-            product: product,
-            values: product,
-            isLoaded: true,
-            touched: false
-          })
+          product: product,
+          values: product,
+          isLoaded: true,
+          touched: false
+        })
       })
     })
     .then(() => {
@@ -115,6 +116,7 @@ class AddSingleProduct extends Component {
               description={values.description}
               price={price}
               unit={selected !== '' ? products[selected].unit : ''}
+              units={this.state.units}
               handleProductChoice={this.handleProductChoice}
               handleChangeTextField={this.handleChangeTextField}
               handleSelectChange={this.handleSelectChange}

@@ -1,4 +1,3 @@
-/* global Stripe */
 import { auth, db , functions, storage } from '../firebase'
 
 export const LOGIN_USER = 'login_user'

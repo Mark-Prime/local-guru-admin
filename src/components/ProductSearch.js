@@ -20,7 +20,7 @@ class ProductSearch extends Component {
 
   render() {
 
-    const { hits, refine, selected, onSelect } = this.props;
+    const { hits, selected } = this.props;
 
     const textField = (
       <Autocomplete.TextField

@@ -2,15 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { fetchUserProducts } from '../../actions/ProductActions'
 import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, CalloutCard } from '@shopify/polaris'
-import Moment from 'react-moment'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-
-const Date = styled.div`
-  color: rgba(0,0,0,0.5);
-  padding: .5rem 0 0;
-`;
 
 const PaginationFooter = styled.div`
   display: flex;

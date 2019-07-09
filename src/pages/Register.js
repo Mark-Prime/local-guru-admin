@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { CardElement } from 'react-stripe-elements'
-import { Tabs, Page, TextField, Card, Form, FormLayout, Scrollable, Button, Checkbox, InlineError } from '@shopify/polaris'
-import { FaFacebookF, FaGoogle } from 'react-icons/fa'
+import { Tabs, Page, TextField, Card, Form, FormLayout, Scrollable, Checkbox, InlineError } from '@shopify/polaris'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { injectStripe } from 'react-stripe-elements'
@@ -90,7 +89,7 @@ class Register extends Component {
     callbacks: {
         // Avoid redirects after sign-in.
         signInSuccessWithAuthResult: (res) => {
-          const { email, uid, displayName, photoURL } = res.user;
+          const { email, displayName } = res.user;
           const firstName = displayName.split(' ')[0];
           const lastName = displayName.split(' ')[1]
 

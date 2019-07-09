@@ -14,7 +14,6 @@ class Survey extends Component {
   }
 
   handleChange = (value, id) => {
-    const { answers } = this.state;
     let index = id;
     if(id === 'TextField1'){
       index = 0;
@@ -24,13 +23,7 @@ class Survey extends Component {
 
   render() {
 
-    const questions = [
-      "What are your goals on the site?",
-      "What are your expectations?"
-    ];
-
     const { back, handleSubmit } = this.props;
-    const { selected } = this.state;
 
     return (
       <Card

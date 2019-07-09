@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Page, Layout, Card } from '@shopify/polaris'
-import { fetchAllProducts, editProduct, fetchSingleProducerProduct } from '../../actions/ProductActions'
+import { editProduct, fetchSingleProducerProduct } from '../../actions/ProductActions'
 import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
 import EditProduct from '../../components/EditProduct'
@@ -61,7 +61,7 @@ class EditSingleProduct extends Component {
   }
 
   handleSubmit = () => {
-    const { selected, product, unit } = this.state;
+    const { product, unit } = this.state;
     const { user } = this.props;
     const { image, title, description, price } = product;
     const { id } = this.props.match.params;
@@ -96,7 +96,7 @@ class EditSingleProduct extends Component {
   render() {
 
     const { touched, unit } = this.state;
-    const { title, description, image, photo, price } = this.state.product;
+    const { title, description, image, price } = this.state.product;
 
     return (
       <Page

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Card, Form, FormLayout, TextField, Icon, Select, TextStylef } from '@shopify/polaris'
+import { Card, Form, FormLayout, TextField, Select } from '@shopify/polaris'
 import PropTypes from 'prop-types'
 
 class EditPhoto extends Component {
@@ -10,7 +10,7 @@ class EditPhoto extends Component {
 
   render() {
 
-    const { edit, title, unit, products, price, description, selected, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
+    const { unit, price, description, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
 
     return (
       <Card>
