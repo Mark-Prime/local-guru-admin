@@ -10,10 +10,10 @@ class EditPhoto extends Component {
 
   render() {
 
-    const { unit, price, description, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
+    const { unit, units, price, description, handleFocus, handleChangeTextField, handleCurrencyBlur, handleAddUnit, handleRemoveUnit, handleChangeUnit } = this.props;
 
     return (
-      <Card>
+      <Card secondaryFooterActions={[{content: 'Add purchase option', onAction: handleAddUnit}]}>
         <Form onSubmit={this.handleSubmit}>
           <Card.Section>
             <FormLayout>
@@ -39,16 +39,39 @@ class EditPhoto extends Component {
               />
             </FormLayout>
           </Card.Section>
-          <Card.Section>
-            <FormLayout>
+          <Card.Section title='Purchase options'>
+          <FormLayout>
+            {units.map((item, index) => (
               <TextField
-                value={unit}
-                id='unit'
-                label='Unit'
-                disabled
+                type="number"
+                id="price"
+                key={index}
+                onFocus={handleFocus}
+                label={`Option ${index + 1}`}
+                labelAction={
+                  index > 0
+                    ? {content: 'Remove', onAction: () => handleRemoveUnit(index)}
+                    : {content: ''}
+                }
+                onBlur={handleCurrencyBlur}
+                value={item.price}
+                min={1}
+                helpText={`You will receive $${(item.price*.8).toFixed(2)} per ${item.value} after fees`}
+                onChange={price => handleChangeUnit(index, item.value, price)}
+                connectedRight={
+                  <Select
+                    label="Weight unit"
+                    labelHidden
+                    onChange={value => handleChangeUnit(index, value, item.price)}
+                    value={item.value}
+                    options={['oz', 'lb', 'bunch', 'each']}
+                  />
+                }
+                prefix="$"
               />
-            </FormLayout>
-          </Card.Section>
+            ))}
+          </FormLayout>
+        </Card.Section>
         </Form>
       </Card>
     );

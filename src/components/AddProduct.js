@@ -11,10 +11,10 @@ class AddProduct extends Component {
 
   render() {
 
-    const { edit, unit, price, description, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur } = this.props;
+    const { edit, unit, units, price, description, handleProductChoice, handleFocus, handleChangeTextField, handleCurrencyBlur, handleChangeUnit, handleAddUnit, handleRemoveUnit } = this.props;
 
     return (
-      <Card secondaryFooterActions={[{content: 'Add unit'}]}>
+      <Card secondaryFooterActions={[{content: 'Add purchase option', onAction: handleAddUnit}]}>
         <Form onSubmit={this.handleSubmit}>
           <Card.Section title='Product'>
             <FormLayout>
@@ -32,33 +32,36 @@ class AddProduct extends Component {
               />
             </FormLayout>
             </Card.Section>
-            <Card.Section title='Prices'>
+            <Card.Section title='Purchase options'>
             <FormLayout>
-              <TextField
-                type="number"
-                id="price"
-                onFocus={handleFocus}
-                onBlur={handleCurrencyBlur}
-                value={price}
-                helpText={`You will receive $${(price*.8).toFixed(2)} per ${unit} after fees`}
-                onChange={handleChangeTextField}
-                connectedRight={
-                  <Select label="Weight unit" labelHidden value='lb' options={['oz', 'lb', 'bunch', 'each']} />
-                }
-                prefix="$"
-              />
-              <TextField
-                type="number"
-                id="price"
-                onFocus={handleFocus}
-                onBlur={handleCurrencyBlur}
-                value='1.00'
-                helpText={`You will receive $${(1*.8).toFixed(2)} per ${unit} after fees`}
-                connectedRight={
-                  <Select label="Weight unit" labelHidden value='each' options={['oz', 'lb', 'bunch', 'each']} />
-                }
-                prefix="$"
-              />
+              {units.map((item, index) => (
+                <TextField
+                  type="number"
+                  id="price"
+                  key={index}
+                  onFocus={handleFocus}
+                  label={`Option ${index + 1}`}
+                  labelAction={
+                    index > 0
+                      ? {content: 'Remove', onAction: () => handleRemoveUnit(index)}
+                      : {content: ''}
+                  }
+                  onBlur={handleCurrencyBlur}
+                  value={item.price}
+                  helpText={`You will receive $${(item.price*.8).toFixed(2)} per ${item.value} after fees`}
+                  onChange={price => handleChangeUnit(index, item.value, price)}
+                  connectedRight={
+                    <Select
+                      label="Weight unit"
+                      labelHidden
+                      onChange={value => handleChangeUnit(index, value, item.price)}
+                      value={item.value}
+                      options={['oz', 'lb', 'bunch', 'each']}
+                    />
+                  }
+                  prefix="$"
+                />
+              ))}
             </FormLayout>
           </Card.Section>
         </Form>
@@ -72,10 +75,9 @@ AddProduct.propTypes = {
   title: PropTypes.string,
   edit: PropTypes.bool,
   unit: PropTypes.string.isRequired,
-  products: PropTypes.array.isRequired,
   price: PropTypes.number.isRequired,
   description: PropTypes.string.isRequired,
-  selected: PropTypes.number.isRequired,
+  selected: PropTypes.string.isRequired,
   handleProductChoice: PropTypes.func.isRequired,
   handleFocus: PropTypes.func.isRequired,
   handleChangeTextField: PropTypes.func.isRequired,

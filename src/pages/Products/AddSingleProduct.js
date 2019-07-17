@@ -22,7 +22,9 @@ class AddSingleProduct extends Component {
       description: '',
       price: 0
     },
-    units: [],
+    units: [
+      { value: 'lb', price: 0 },
+    ],
     title: '',
     selected: '',
     inputText: '',
@@ -33,13 +35,12 @@ class AddSingleProduct extends Component {
   componentDidMount(){
     fetchAllProducts()
     .then(products => {
-      console.log(products)
       this.setState({ products: products })
     })
   }
 
   handleProductChoice = (selected) => {
-    let index = this.state.products.findIndex(p => p.title === selected)
+    let index = this.state.products.findIndex(p => p.title === selected[0])
     this.setState({ selected: index })
   }
 
@@ -68,14 +69,45 @@ class AddSingleProduct extends Component {
     this.setState({ values: { ...this.state.values, price: price } })
   }
 
+  handleChangeUnit = (index, value, price) => {
+    // copy array
+    const units = this.state.units.slice()
+    // edit array
+    units[index] = { price: price, value: value }
+    // set state with new array
+    this.setState({
+      units: units
+    })
+  }
+
+  handleAddUnit = () => {
+    // copy array
+    let units = this.state.units.slice()
+    // check length
+    units = [...units, { value: 'lb', price: 0}]
+    // set state with new array
+    this.setState({ units: units })
+  }
+
+  handleRemoveUnit = (index) => {
+    console.log(index)
+    // copy array
+    const units = this.state.units.slice()
+    // remove item
+    units.splice(index, 1)
+    // set state with new array
+    this.setState({ units: units })
+  }
+
   handleSubmit = () => {
-    const { selected, values } = this.state;
+    const { selected, values, units } = this.state;
     const { user } = this.props;
     const { image, title, unit, id } = this.state.products[selected];
     console.log(id)
-    editProduct(user, id, values, image, title, unit)
+    editProduct(user, id, values, image, title, unit, units)
     .then(() => {
       fetchSingleProduct(id).then(product => {
+        console.log(product)
         this.setState({
           product: product,
           values: product,
@@ -122,6 +154,9 @@ class AddSingleProduct extends Component {
               handleSelectChange={this.handleSelectChange}
               handleFocus={this.handleFocus}
               handleCurrencyBlur={this.handleCurrencyBlur}
+              handleChangeUnit={this.handleChangeUnit}
+              handleAddUnit={this.handleAddUnit}
+              handleRemoveUnit={this.handleRemoveUnit}
             />
           </Layout.Section>
           <Layout.Section secondary>

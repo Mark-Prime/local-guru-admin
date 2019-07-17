@@ -25,9 +25,9 @@ export function fetchUserProducts(user){
     .then(snapshot => {
 
       let products = [];
-
+      console.log(snapshot.docs)
       snapshot.forEach((doc) => {
-        if(doc.data().price){
+        if(doc.data().product){
           products = [doc.data(), ...products]
         }
       })
@@ -99,7 +99,7 @@ export function fetchSingleProducerProduct(id, uid) {
   .then(doc => doc.data());
 }
 
-export function editProduct(user, id, values, image, title, unit){
+export function editProduct(user, id, values, image, title, unit, units){
   console.log('user', user)
   console.log('id', id)
   const name = `${user.displayName}`
@@ -115,7 +115,8 @@ export function editProduct(user, id, values, image, title, unit){
     image: image,
     product: id,
     title: title,
-    unit: unit
+    unit: unit,
+    units: units
   },{ merge: true })
   .then(() => {
     console.log(id)

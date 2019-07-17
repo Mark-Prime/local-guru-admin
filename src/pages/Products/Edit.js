@@ -20,7 +20,8 @@ class EditSingleProduct extends Component {
     isLoaded: false,
     touched: false,
     product: {},
-    unit: 'oz'
+    unit: 'oz',
+    units: []
   }
 
   componentDidMount(){
@@ -28,7 +29,7 @@ class EditSingleProduct extends Component {
     fetchSingleProducerProduct(id, this.props.user.uid)
     .then(product => {
       console.log(product.unit)
-      this.setState({ product: product, unit: product.unit })
+      this.setState({ product: product, unit: product.unit, units: product.units })
     })
   }
 
@@ -56,12 +57,39 @@ class EditSingleProduct extends Component {
     this.setState({ product: {...this.state.product, price: price} })
   }
 
-  handleUnitChange = (unit) => {
-    this.setState({ unit: unit, touched: true })
+  handleChangeUnit = (index, value, price) => {
+    // copy array
+    const units = this.state.units.slice()
+    // edit array
+    units[index] = { price: price, value: value }
+    // set state with new array
+    this.setState({
+      units: units,
+      touched: true
+    })
+  }
+
+  handleAddUnit = () => {
+    // copy array
+    let units = this.state.units.slice()
+    // check length
+    units = [...units, { value: 'lb', price: 0}]
+    // set state with new array
+    this.setState({ units: units, touched: true })
+  }
+
+  handleRemoveUnit = (index) => {
+    console.log(index)
+    // copy array
+    const units = this.state.units.slice()
+    // remove item
+    units.splice(index, 1)
+    // set state with new array
+    this.setState({ units: units, touched: true })
   }
 
   handleSubmit = () => {
-    const { product, unit } = this.state;
+    const { product, unit, units } = this.state;
     const { user } = this.props;
     const { image, title, description, price } = product;
     const { id } = this.props.match.params;
@@ -71,7 +99,7 @@ class EditSingleProduct extends Component {
       price: price
     }
 
-    editProduct(user, id, values, image, title, unit)
+    editProduct(user, id, values, image, title, unit, units)
     .then(() => {
       fetchSingleProducerProduct(id, this.props.user.uid).then(product => {
         this.setState({
@@ -95,7 +123,7 @@ class EditSingleProduct extends Component {
 
   render() {
 
-    const { touched, unit } = this.state;
+    const { touched, unit, units } = this.state;
     const { title, description, image, price } = this.state.product;
 
     return (
@@ -111,10 +139,13 @@ class EditSingleProduct extends Component {
               description={description}
               price={price}
               unit={unit}
-              handleUnitChange={this.handleUnitChange}
+              units={units}
               handleChangeTextField={this.handleChangeTextField}
               handleFocus={this.handleFocus}
               handleCurrencyBlur={this.handleCurrencyBlur}
+              handleChangeUnit={this.handleChangeUnit}
+              handleAddUnit={this.handleAddUnit}
+              handleRemoveUnit={this.handleRemoveUnit}
             />
           </Layout.Section>
           <Layout.Section secondary>
