@@ -1,21 +1,24 @@
 import React, { Component } from 'react'
 import './App.css'
-import { connect } from 'react-redux';
-import styled from 'styled-components';
+import { connect } from 'react-redux'
+import styled from 'styled-components'
 import { Frame, Layout, Toast } from '@shopify/polaris'
 import Nav from './components/Nav'
+import ViewOrder from './pages/Orders/ViewOrder'
+import NavAdmin from './components/NavAdmin'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import Login from './components/Login'
 import Register from './pages/Register'
 import Orders from './pages/Orders'
+import OrdersAdmin from './pages/Orders/OrdersAdmin'
 import EditSingleProduct from './pages/Products/Edit'
 import AddSingleProduct from './pages/Products/AddSingleProduct'
 import { toggleToast } from './actions/UIActions'
 import Settings from './pages/Settings'
 import { getProducer, logoutUser } from './actions/UserActions'
-import { fetchTransactions } from './actions/TransactionActions'
+import { fetchTransactions, fetchTransactionsAdmin } from './actions/TransactionActions'
 
 const { Section } = Layout;
 
@@ -34,7 +37,11 @@ class App extends Component {
   componentDidUpdate(prevProps){
     if(this.props.user.authenticated !== prevProps.user.authenticated){
       this.props.getProducer()
-      this.props.fetchTransactions(this.props.user.uid)
+      if(this.props.user.admin){
+        this.props.fetchTransactionsAdmin()
+      } else {
+        this.props.fetchTransactions(this.props.user.uid)
+      }
     }
   }
 
@@ -44,13 +51,18 @@ class App extends Component {
         {this.props.user.uid
           ?
             <Wrapper>
-              <Nav logout={this.props.logoutUser} />
+              {this.props.user.admin
+                ? <NavAdmin logout={this.props.logoutUser} />
+                : <Nav logout={this.props.logoutUser} />
+              }
+
               <Layout>
                 <Section>
                   <Switch>
                     <Route exact path='/' component={Home} />
                     <Route path='/product/edit/:id' component={EditSingleProduct} />
-                    <Route path='/orders' component={Orders} />
+                    <Route path='/order/view/:id' component={ViewOrder} />
+                    <Route path='/orders' component={this.props.user.admin ? OrdersAdmin : Orders} />
                     <Route path='/products/add' component={AddSingleProduct} />
                     <Route exact path='/products' component={Products} />
                     <Route path='/account' component={Settings} />
@@ -82,4 +94,4 @@ export default withRouter(connect((state, ownProps) => ({
   ui: state.ui,
   user: state.user,
   transactions: state.transactions
-}), { toggleToast, fetchTransactions, getProducer, logoutUser })(App));
+}), { toggleToast, fetchTransactions, fetchTransactionsAdmin, getProducer, logoutUser })(App));

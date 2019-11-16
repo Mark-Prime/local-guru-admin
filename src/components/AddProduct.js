@@ -46,7 +46,7 @@ class AddProduct extends Component {
                       ? {content: 'Remove', onAction: () => handleRemoveUnit(index)}
                       : {content: ''}
                   }
-                  onBlur={handleCurrencyBlur}
+                  onBlur={() => handleCurrencyBlur(index)}
                   value={item.price}
                   helpText={`You will receive $${(item.price*.8).toFixed(2)} per ${item.value} after fees`}
                   onChange={price => handleChangeUnit(index, item.value, price)}
@@ -75,7 +75,6 @@ AddProduct.propTypes = {
   title: PropTypes.string,
   edit: PropTypes.bool,
   unit: PropTypes.string.isRequired,
-  price: PropTypes.number.isRequired,
   description: PropTypes.string.isRequired,
   selected: PropTypes.string.isRequired,
   handleProductChoice: PropTypes.func.isRequired,

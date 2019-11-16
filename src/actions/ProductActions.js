@@ -1,22 +1,28 @@
-import { db } from '../firebase'
+import { db, storage } from '../firebase'
 
 export const FETCH_ALL_PRODUCTS = 'fetch_all_products';
 export const FETCH_USER_PRODUCTS = 'fetch_user_products';
 export const FETCH_TAGGED_PRODUCTS = 'fetch_tagged_products';
 export const FETCH_CATEGORY = 'fetch_category';
 
-export function fetchAllProducts() {
-  return db.collection('products').orderBy('title', 'asc').get()
-  .then(snapshot => {
+export function fetchAllProducts(user){
+  return dispatch => {
+    return db.collection('products').orderBy('title', 'desc').get()
+    .then(snapshot => {
 
-    let products = [];
+      let products = [];
+      snapshot.forEach((doc) => {
+        products = [doc.data(), ...products]
+      })
 
-    snapshot.forEach((doc, index) => {
-      products = [doc.data(), ...products]
+      console.log(products)
+
+      return dispatch({
+        type: FETCH_USER_PRODUCTS,
+        payload: products
+      })
     })
-
-     return products;
-  })
+  }
 }
 
 export function fetchUserProducts(user){
@@ -34,7 +40,7 @@ export function fetchUserProducts(user){
 
       console.log(products)
 
-       return dispatch({
+      return dispatch({
         type: FETCH_USER_PRODUCTS,
         payload: products
       })
@@ -99,6 +105,31 @@ export function fetchSingleProducerProduct(id, uid) {
   .then(doc => doc.data());
 }
 
+export function createProduct(title, category, tags, photo){
+  if(photo){
+    return storage.ref().child(`producers/${photo.name}`).put(photo)
+    .then(snapshot => {
+      return snapshot.ref.getDownloadURL()
+    })
+    .then(photoURL => {
+      return db.collection('products').add({
+        title: title,
+        image: photoURL,
+        tags: tags,
+        category: category
+      })
+    })
+    .then(doc => doc.id)
+  } else {
+    return db.collection('products').add({
+      title: title,
+      tags: tags,
+      category: category
+    })
+    .then(doc => doc.id)
+  }
+}
+
 export function editProduct(user, id, values, image, title, unit, units){
   console.log('user', user)
   console.log('id', id)
@@ -115,7 +146,6 @@ export function editProduct(user, id, values, image, title, unit, units){
     image: image,
     product: id,
     title: title,
-    unit: unit,
     units: units
   },{ merge: true })
   .then(() => {

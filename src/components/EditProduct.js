@@ -23,20 +23,6 @@ class EditPhoto extends Component {
                 label='Description'
                 onChange={handleChangeTextField}
               />
-              <TextField
-                label="Price"
-                type="number"
-                id="price"
-                onFocus={handleFocus}
-                onBlur={handleCurrencyBlur}
-                value={price}
-                onChange={handleChangeTextField}
-                prefix="$"
-                helpText={`You will receive $${(price*.8).toFixed(2)} per ${unit} after fees`}
-                connectedRight={
-                  <Select label="Weight unit" value={unit} onChange={this.props.handleUnitChange} labelHidden options={['oz', 'lb']} />
-                }
-              />
             </FormLayout>
           </Card.Section>
           <Card.Section title='Purchase options'>
@@ -53,7 +39,7 @@ class EditPhoto extends Component {
                     ? {content: 'Remove', onAction: () => handleRemoveUnit(index)}
                     : {content: ''}
                 }
-                onBlur={handleCurrencyBlur}
+                onBlur={() => handleCurrencyBlur(index)}
                 value={item.price}
                 min={1}
                 helpText={`You will receive $${(item.price*.8).toFixed(2)} per ${item.value} after fees`}

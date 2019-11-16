@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Page, Layout, Card } from '@shopify/polaris'
-import { editProduct, fetchSingleProducerProduct } from '../../actions/ProductActions'
+import { editProduct, fetchSingleProducerProduct, fetchSingleProduct, createProduct } from '../../actions/ProductActions'
 import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
 import EditProduct from '../../components/EditProduct'
+import EditProductAdmin from '../../components/EditProductAdmin'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
@@ -20,17 +21,27 @@ class EditSingleProduct extends Component {
     isLoaded: false,
     touched: false,
     product: {},
+    category: '',
     unit: 'oz',
-    units: []
+    units: [],
+    tags: []
   }
 
   componentDidMount(){
     const { id } = this.props.match.params;
-    fetchSingleProducerProduct(id, this.props.user.uid)
-    .then(product => {
-      console.log(product.unit)
-      this.setState({ product: product, unit: product.unit, units: product.units })
-    })
+
+    if(this.props.user.admin){
+      fetchSingleProduct(id)
+      .then(product => {
+        this.setState({ product: product, tags: product.tags, category: product.category, isLoaded: true })
+      })
+    } else {
+      fetchSingleProducerProduct(id, this.props.user.uid)
+      .then(product => {
+        console.log(product.unit)
+        this.setState({ product: product, unit: product.unit, units: product.units, isLoaded: true })
+      })
+    }
   }
 
   handleProductChoice = (selected) => {
@@ -52,9 +63,25 @@ class EditSingleProduct extends Component {
     e.target.select()
   }
 
-  handleCurrencyBlur = () => {
-    const price = Number(this.state.product.price).toFixed(2)
-    this.setState({ product: {...this.state.product, price: price} })
+  handleCategoryChange = (value) => {
+    console.log(value)
+    this.setState({ category: value, touched: true })
+  }
+
+  handleCurrencyBlur = (index) => {
+    console.log(index)
+    const price = Number(this.state.units[index].price).toFixed(2)
+    console.log(price)
+
+    let units = this.state.units.slice()
+
+    units[index] = { ...units[index], price: price}
+
+    console.log(units[index].price)
+
+    this.setState({
+      units: units
+    })
   }
 
   handleChangeUnit = (index, value, price) => {
@@ -121,32 +148,86 @@ class EditSingleProduct extends Component {
     this.props.history.goBack();
   }
 
+  handleUpload = (file) => {
+    this.setState({ photo: file })
+  }
+
+  handleSelectChange = (value) => {
+    this.setState({ category: value })
+  }
+
+  handleAddTag = (tag) => {
+    const newTags = [...this.state.tags, tag]
+    this.setState({ tags: newTags, touched: true })
+  }
+
+  handleRemoveTag = (index) => {
+    const tags = [...this.state.tags];
+    const newTags = tags.splice(index, 1)
+    console.log(newTags)
+    this.setState({ tags: newTags, touched: true })
+  }
+
+  handleSubmitAdmin = () => {
+    const { tags, category, values } = this.state;
+    const { title } = this.state.product;
+
+    createProduct(title, category, tags)
+    .then(id => {
+      fetchSingleProduct(id).then(product => {
+        this.setState({
+          isLoaded: true,
+          touched: false
+        })
+      })
+    })
+    .then(() => {
+      this.props.toggleToast('Product updated')
+    })
+  }
+
   render() {
 
     const { touched, unit, units } = this.state;
-    const { title, description, image, price } = this.state.product;
+    const { title, description, image, price, category, tags } = this.state.product;
 
     return (
       <Page
         breadcrumbs={[{content: 'Products', onAction: this.goBack}]}
         title={title}
-        primaryAction={{ content: 'Save', disabled: !touched, onAction: this.handleSubmit }}
+        primaryAction={{ content: 'Save', disabled: !touched, onAction: this.props.user.admin ? this.handleSubmitAdmin : this.handleSubmit }}
       >
         <Layout>
+          {this.state.isLoaded &&
+            <>
           <Layout.Section>
-            <EditProduct
-              title={title}
-              description={description}
-              price={price}
-              unit={unit}
-              units={units}
-              handleChangeTextField={this.handleChangeTextField}
-              handleFocus={this.handleFocus}
-              handleCurrencyBlur={this.handleCurrencyBlur}
-              handleChangeUnit={this.handleChangeUnit}
-              handleAddUnit={this.handleAddUnit}
-              handleRemoveUnit={this.handleRemoveUnit}
-            />
+            {this.props.user.admin
+              ?
+                <EditProductAdmin
+                  title={title}
+                  handleChangeTextField={this.handleChangeTextField}
+                  category={this.state.category}
+                  tags={this.state.tags}
+                  handleChangeTextField={this.handleChangeTextField}
+                  handleCategoryChange={this.handleCategoryChange}
+                  handleAddTag={this.handleAddTag}
+                  handleRemoveTag={this.handleRemoveTag}
+                />
+              :
+                <EditProduct
+                  title={title}
+                  description={description}
+                  price={price}
+                  unit={unit}
+                  units={units}
+                  handleChangeTextField={this.handleChangeTextField}
+                  handleFocus={this.handleFocus}
+                  handleCurrencyBlur={this.handleCurrencyBlur}
+                  handleChangeUnit={this.handleChangeUnit}
+                  handleAddUnit={this.handleAddUnit}
+                  handleRemoveUnit={this.handleRemoveUnit}
+                />
+            }
           </Layout.Section>
           <Layout.Section secondary>
             <Card sectioned>
@@ -155,6 +236,8 @@ class EditSingleProduct extends Component {
               </Image>
             </Card>
           </Layout.Section>
+          </>
+        }
         </Layout>
       </Page>
     );

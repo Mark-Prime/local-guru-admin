@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { fetchUserProducts } from '../../actions/ProductActions'
+import { fetchUserProducts, fetchAllProducts } from '../../actions/ProductActions'
 import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, CalloutCard } from '@shopify/polaris'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
@@ -26,10 +26,17 @@ class Products extends Component {
   }
 
   componentDidMount(){
-    this.props.fetchUserProducts(this.props.user.uid)
-    .then(() => {
-      this.setState({ isLoaded: true })
-    })
+    if(this.props.user.admin){
+      this.props.fetchAllProducts()
+      .then(() => {
+        this.setState({ isLoaded: true })
+      })
+    } else {
+      this.props.fetchUserProducts(this.props.user.uid)
+      .then(() => {
+        this.setState({ isLoaded: true })
+      })
+    }
   }
 
   handleSearchChange = (searchValue) => {
@@ -92,7 +99,7 @@ class Products extends Component {
       <ResourceList.Item
         id={created_at}
         media={media}
-        url={`/product/edit/${product}`}
+        url={this.props.user.admin ? `/product/edit/${item.id}` : `/product/edit/${product}`}
         accessibilityLabel={`View details for ${title}`}
       >
         <h3>
@@ -183,4 +190,4 @@ Products.propTypes = {
 export default withRouter(connect((state, ownProps) => ({
   products: state.products,
   user: state.user
-}), { fetchUserProducts })(Products));
+}), { fetchUserProducts, fetchAllProducts })(Products));

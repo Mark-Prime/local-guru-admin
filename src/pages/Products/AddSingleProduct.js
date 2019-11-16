@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Page, Layout, Card } from '@shopify/polaris'
-import { fetchAllProducts, editProduct, fetchSingleProduct } from '../../actions/ProductActions'
+import { fetchAllProducts, editProduct, fetchSingleProduct, createProduct } from '../../actions/ProductActions'
 import { toggleToast } from '../../actions/UIActions'
 import { withRouter } from 'react-router-dom'
 import AddProduct from '../../components/AddProduct'
+import AddProductAdmin from '../../components/AddProductAdmin'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
+import ProductPhotoUpload from '../../components/ProductPhotoUpload'
 
 const Image = styled.div`
   img {
@@ -27,25 +29,30 @@ class AddSingleProduct extends Component {
     ],
     title: '',
     selected: '',
+    category: 'veggies',
+    photo: '',
+    tags: [],
     inputText: '',
     products: {},
     touched: false,
   }
 
   componentDidMount(){
-    fetchAllProducts()
-    .then(products => {
-      this.setState({ products: products })
-    })
+    if(!this.props.user.admin){
+      this.props.fetchAllProducts()
+      .then(products => {
+        this.setState({ products: products })
+      })
+    }
   }
 
   handleProductChoice = (selected) => {
-    let index = this.state.products.findIndex(p => p.title === selected[0])
+    console.log(selected[0])
+    let index = this.props.products.findIndex(p => p.title === selected[0])
     this.setState({ selected: index })
   }
 
   handleChangeTextField = (value, id) => {
-    console.log(value, id)
     this.setState({ touched: true })
     this.setState({ values: { ...this.state.values, [id]: value }})
   }
@@ -64,20 +71,42 @@ class AddSingleProduct extends Component {
     e.target.select()
   }
 
-  handleCurrencyBlur = () => {
-    const price = Number(this.state.values.price).toFixed(2)
-    this.setState({ values: { ...this.state.values, price: price } })
+  handleCurrencyBlur = (index) => {
+    console.log(index)
+    const price = Number(this.state.units[index].price).toFixed(2)
+    console.log(price)
+
+    let units = this.state.units.slice()
+
+    units[index] = { ...units[index], price: price}
+
+    console.log(units[index].price)
+
+    this.setState({
+      units: units
+    })
   }
 
   handleChangeUnit = (index, value, price) => {
     // copy array
     const units = this.state.units.slice()
     // edit array
-    units[index] = { price: price, value: value }
+    units[index] = { price: Number(price), value: value }
     // set state with new array
     this.setState({
       units: units
     })
+  }
+
+  handleAddTag = (tag) => {
+    const newTags = [...this.state.tags, tag]
+    this.setState({ tags: newTags })
+  }
+
+  handleRemoveTag = (index) => {
+    const tags = [...this.state.tags];
+    const newTags = tags.splice(index, 1)
+    this.setState({ tags: newTags, touched: true })
   }
 
   handleAddUnit = () => {
@@ -99,10 +128,28 @@ class AddSingleProduct extends Component {
     this.setState({ units: units })
   }
 
+  handleSubmitAdmin = () => {
+    const { tags, photo, category, values } = this.state;
+    const { title } = values;
+
+    createProduct(title, category, tags, photo)
+    .then(id => {
+      fetchSingleProduct(id).then(product => {
+        this.setState({
+          isLoaded: true,
+          touched: false
+        })
+      })
+    })
+    .then(() => {
+      this.props.toggleToast('Product updated')
+    })
+  }
+
   handleSubmit = () => {
     const { selected, values, units } = this.state;
     const { user } = this.props;
-    const { image, title, unit, id } = this.state.products[selected];
+    const { image, title, unit, id } = this.props.products[selected];
     console.log(id)
     editProduct(user, id, values, image, title, unit, units)
     .then(() => {
@@ -128,45 +175,74 @@ class AddSingleProduct extends Component {
     this.props.history.goBack();
   }
 
+  handleUpload = (file) => {
+    this.setState({ photo: file })
+  }
+
+  handleCategoryChange = (value) => {
+    this.setState({ category: value, touched: true })
+  }
+
   render() {
 
-    const { touched, values, selected, products, title } = this.state;
+    const { touched, values, selected, title, category, tags } = this.state;
+    const { products } = this.props;
     const { price } = values;
 
     return (
       <Page
         breadcrumbs={[{content: 'Products', onAction: this.goBack}]}
         title='Add Product'
-        primaryAction={{ content: 'Save', disabled: !touched, onAction: this.handleSubmit }}
+        primaryAction={{ content: 'Save', disabled: !touched, onAction: this.props.user.admin ? this.handleSubmitAdmin : this.handleSubmit }}
       >
         <Layout>
           <Layout.Section>
-            <AddProduct
-              products={products}
-              title={title}
-              selected={selected}
-              description={values.description}
-              price={price}
-              unit={selected !== '' ? products[selected].unit : ''}
-              units={this.state.units}
-              handleProductChoice={this.handleProductChoice}
-              handleChangeTextField={this.handleChangeTextField}
-              handleSelectChange={this.handleSelectChange}
-              handleFocus={this.handleFocus}
-              handleCurrencyBlur={this.handleCurrencyBlur}
-              handleChangeUnit={this.handleChangeUnit}
-              handleAddUnit={this.handleAddUnit}
-              handleRemoveUnit={this.handleRemoveUnit}
-            />
+            {this.props.user.admin
+              ?
+                <AddProductAdmin
+                  title={values.title}
+                  category={category}
+                  tags={tags}
+                  handleChangeTextField={this.handleChangeTextField}
+                  handleCategoryChange={this.handleCategoryChange}
+                  handleAddTag={this.handleAddTag}
+                  handleRemoveTag={this.handleRemoveTag}
+                />
+              :
+                <AddProduct
+                  products={products}
+                  title={title}
+                  selected={selected}
+                  description={values.description}
+                  price={price}
+                  unit={selected !== '' ? products[selected].unit : ''}
+                  units={this.state.units}
+                  handleProductChoice={this.handleProductChoice}
+                  handleChangeTextField={this.handleChangeTextField}
+                  handleSelectChange={this.handleSelectChange}
+                  handleFocus={this.handleFocus}
+                  handleCurrencyBlur={this.handleCurrencyBlur}
+                  handleChangeUnit={this.handleChangeUnit}
+                  handleAddUnit={this.handleAddUnit}
+                  handleRemoveUnit={this.handleRemoveUnit}
+                />
+            }
           </Layout.Section>
           <Layout.Section secondary>
             <Card sectioned>
               <Image>
-                {selected !== ''
+                {this.props.user.admin
                   ?
-                    <img src={products[selected].image} alt={products[selected].title} />
+                    <ProductPhotoUpload onChange={this.handleUpload} />
                   :
-                    null
+                  <>
+                    {selected !== ''
+                      ?
+                        <img src={products[selected].image} alt={products[selected].title} />
+                      :
+                        null
+                    }
+                  </>
                 }
               </Image>
             </Card>
@@ -183,5 +259,6 @@ AddSingleProduct.propTypes = {
 }
 
 export default withRouter(connect((state, ownProps) => ({
-  user: state.user
-}), { toggleToast })(AddSingleProduct));
+  user: state.user,
+  products: state.products
+}), { toggleToast, fetchAllProducts })(AddSingleProduct));
