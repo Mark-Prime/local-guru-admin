@@ -11,7 +11,6 @@ import {
   TextStyle,
   Thumbnail,
   Pagination,
-  CalloutCard,
   EmptyState
 } from "@shopify/polaris";
 import emptyProducts from "../../assets/empty-products.svg";
@@ -170,7 +169,7 @@ class Products extends Component {
               action={{ content: "Add product" }}
               secondaryAction={{
                 content: "Learn more",
-                url: "https://help.shopify.com"
+                url: "/help"
               }}
               heading="Manage your products"
               image={emptyProducts}
