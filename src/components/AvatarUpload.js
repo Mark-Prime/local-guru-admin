@@ -1,28 +1,32 @@
-import React, { Component } from 'react'
-import styled from 'styled-components';
-import { DropZone, Stack, Thumbnail, Caption } from '@shopify/polaris'
+import React, { Component } from "react";
+import styled from "styled-components";
+import { DropZone, Stack, Thumbnail, Caption } from "@shopify/polaris";
 
 const Wrapper = styled.div`
   width: 200px;
 `;
 
 class AvatarUpload extends Component {
-
   state = {
-    files: [],
-  }
+    files: []
+  };
 
-  componentDidUpdate(prevProps, prevState){
-    if(this.state.files !== prevState.files){
-      this.props.onChange(this.state.files[0])
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.files !== prevState.files) {
+      this.props.onChange(this.state.files[0]);
     }
   }
 
   render() {
-    const {files} = this.state;
-    const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+    const { files } = this.state;
+    const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
 
-    const fileUpload = !files.length && <DropZone.FileUpload />;
+    const fileUpload = !files.length && (
+      <DropZone.FileUpload
+        actionTitle="Add file"
+        actionHint="or drop files to upload"
+      />
+    );
     const uploadedFiles = files.length > 0 && (
       <Stack vertical>
         {files.map((file, index) => (
@@ -33,7 +37,7 @@ class AvatarUpload extends Component {
               source={
                 validImageTypes.indexOf(file.type) > 0
                   ? window.URL.createObjectURL(file)
-                  : 'https://cdn.shopify.com/s/files/1/0757/9955/files/New_Post.png?12678548500147524304'
+                  : "https://cdn.shopify.com/s/files/1/0757/9955/files/New_Post.png?12678548500147524304"
               }
             />
             <div>
@@ -47,10 +51,10 @@ class AvatarUpload extends Component {
     return (
       <Wrapper>
         <DropZone
-          label='Profile photo'
+          label="Profile photo"
           allowMultiple={false}
           onDrop={(files, acceptedFiles, rejectedFiles) => {
-            this.setState({files: [...this.state.files, ...acceptedFiles]});
+            this.setState({ files: [...this.state.files, ...acceptedFiles] });
           }}
         >
           {uploadedFiles}
@@ -61,4 +65,4 @@ class AvatarUpload extends Component {
   }
 }
 
-export default AvatarUpload
+export default AvatarUpload;
