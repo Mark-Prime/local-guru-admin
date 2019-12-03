@@ -8,7 +8,7 @@ import {
 } from "../../actions/UserActions";
 import { toggleToast } from "../../actions/UIActions";
 import AvatarUpload from "../../components/AvatarUpload";
-import { injectStripe, CardElement } from "react-stripe-elements";
+import { injectStripe } from "react-stripe-elements";
 import {
   Thumbnail,
   Page,
@@ -22,8 +22,6 @@ import Password from "./Password";
 import PayoutCard from "./PayoutCard";
 
 const { Section } = Layout;
-
-const Form = styled.form``;
 
 class Settings extends Component {
   state = {
