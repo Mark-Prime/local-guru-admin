@@ -9,6 +9,7 @@ import {
   AnalyticsMajorMonotone,
   CustomersMajorMonotone,
   SettingsMajorMonotone,
+  InventoryMajorMonotone,
   LogOutMinor
 } from "@shopify/polaris-icons";
 
@@ -54,6 +55,11 @@ class Nav extends Component {
               url: "/analytics",
               label: "Analytics",
               icon: AnalyticsMajorMonotone
+            },
+            {
+              url: "/open-house",
+              label: "Open House",
+              icon: InventoryMajorMonotone
             }
           ]}
         />
