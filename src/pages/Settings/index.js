@@ -18,6 +18,7 @@ import {
   FormLayout,
   Button
 } from "@shopify/polaris";
+import { ViewMajorMonotone } from "@shopify/polaris-icons";
 import Password from "./Password";
 import PayoutCard from "./PayoutCard";
 
@@ -119,7 +120,17 @@ class Settings extends Component {
   render() {
     return (
       <div>
-        <Page title="Account Settings">
+        <Page
+          title="Account Settings"
+          secondaryActions={[
+            {
+              content: "View your profile",
+              icon: ViewMajorMonotone,
+              external: true,
+              url: `https://local-guru-aeac9.firebaseapp.com/producer/${this.props.user.uid}`
+            }
+          ]}
+        >
           <Layout>
             <Section>
               <Card
