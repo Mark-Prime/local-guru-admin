@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Login from "./components/Login";
 import Register from "./pages/Register";
+import OpenHouse from "./pages/OpenHouse";
 import Orders from "./pages/Orders";
 import Followers from "./pages/Followers";
 import OrdersAdmin from "./pages/Orders/OrdersAdmin";
@@ -77,6 +78,7 @@ class App extends Component {
                   <Route exact path="/products" component={Products} />
                   <Route path="/account" component={Settings} />
                   <Route path="/create-account" component={Register} />
+                  <Route path="/open-house" component={OpenHouse} />
                 </Switch>
               </Section>
             </Layout>
