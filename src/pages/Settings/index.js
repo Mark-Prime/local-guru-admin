@@ -19,6 +19,7 @@ import {
   Button
 } from "@shopify/polaris";
 import Password from "./Password";
+import PayoutCard from "./PayoutCard";
 
 const { Section } = Layout;
 
@@ -175,27 +176,7 @@ class Settings extends Component {
                 </FormLayout>
               </Card>
               <Password />
-              <Card title="Debit Card for Payout" sectioned>
-                {this.props.user.token && (
-                  <Card title={this.props.user.token.card.brand} sectioned>
-                    •••• {this.props.user.token.card.last4}
-                  </Card>
-                )}
-                <br />
-                <Form onSubmit={this.handleAddCard}>
-                  <CardElement
-                    style={{
-                      base: {
-                        fontSize: "16px"
-                      }
-                    }}
-                  />
-                  <br />
-                  <Button submit type="primary">
-                    Add Card
-                  </Button>
-                </Form>
-              </Card>
+              <PayoutCard user={this.props.user} />
               <Card
                 title="Bank"
                 sectioned
