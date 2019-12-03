@@ -10,6 +10,7 @@ import { Switch, Route, withRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Login from "./components/Login";
+import Help from "./pages/Help";
 import Register from "./pages/Register";
 import OpenHouse from "./pages/OpenHouse";
 import Orders from "./pages/Orders";
@@ -79,6 +80,7 @@ class App extends Component {
                   <Route path="/account" component={Settings} />
                   <Route path="/create-account" component={Register} />
                   <Route path="/open-house" component={OpenHouse} />
+                  <Route path="/help" component={Help} />
                 </Switch>
               </Section>
             </Layout>
