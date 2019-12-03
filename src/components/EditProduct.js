@@ -17,9 +17,7 @@ class EditPhoto extends Component {
 
   render() {
     const {
-      unit,
       units,
-      price,
       description,
       handleFocus,
       handleChangeTextField,
