@@ -1,74 +1,99 @@
-import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
-import { Navigation } from '@shopify/polaris'
-import PropTypes from 'prop-types'
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+import { Navigation } from "@shopify/polaris";
+import PropTypes from "prop-types";
+import {
+  HomeMajorMonotone,
+  ProductsMajorMonotone,
+  OrdersMajorMonotone,
+  AnalyticsMajorMonotone,
+  CustomersMajorMonotone,
+  SettingsMajorMonotone,
+  InventoryMajorMonotone,
+  QuestionMarkMajorMonotone,
+  LogOutMinor
+} from "@shopify/polaris-icons";
 
 const Section = Navigation.Section;
 
 class Nav extends Component {
-
-  render(){
+  render() {
     return (
       <Navigation location={this.props.location.pathname}>
         <Section
           items={[
             {
-              url: '/',
-              label: 'Home',
-              icon: 'home',
+              url: "/",
+              label: "Home",
+              icon: HomeMajorMonotone
             },
             {
-              url: '/orders',
-              label: 'Orders',
-              icon: 'orders',
+              url: "/orders",
+              label: "Orders",
+              icon: OrdersMajorMonotone
             },
             {
-              url: '/products',
-              label: 'Products',
-              icon: 'products',
+              url: "/followers",
+              label: "Followers",
+              icon: CustomersMajorMonotone
+            },
+            {
+              url: "/products",
+              label: "Products",
+              icon: ProductsMajorMonotone,
               subNavigationItems: [
                 {
-                  url: '/products',
-                  label: 'All Products'
+                  url: "/products",
+                  label: "All Products"
                 },
                 {
-                  url: '/products/add',
-                  label: 'Add New Product'
+                  url: "/products/add",
+                  label: "Add New Product"
                 }
               ]
             },
             {
-              url: '/analytics',
-              label: 'Analytics',
-              icon: 'view'
+              url: "/analytics",
+              label: "Analytics",
+              icon: AnalyticsMajorMonotone
+            },
+            {
+              url: "/open-house",
+              label: "Open House",
+              icon: InventoryMajorMonotone
             }
-        ]}
+          ]}
         />
         <Section
-          title='Settings'
+          title="Settings"
           separator
           items={[
             {
-              url: '/account',
-              label: 'Account',
-              icon: 'profile'
+              url: "/account",
+              label: "Account",
+              icon: SettingsMajorMonotone
             },
             {
-              label: 'Sign Out',
-              icon: 'logOut',
+              url: "/help",
+              label: "Help",
+              icon: QuestionMarkMajorMonotone
+            },
+            {
+              label: "Sign Out",
+              icon: LogOutMinor,
               onClick: () => {
-                  this.props.logout()
-                }
+                this.props.logout();
+              }
             }
-        ]}
-      />
-    </Navigation>
-    )
+          ]}
+        />
+      </Navigation>
+    );
   }
 }
 
 Nav.propTypes = {
   location: PropTypes.object.isRequired
-}
+};
 
 export default withRouter(Nav);

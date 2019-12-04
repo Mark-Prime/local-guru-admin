@@ -1,10 +1,22 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { fetchUserProducts, fetchAllProducts } from '../../actions/ProductActions'
-import { Page, Card, ResourceList, TextStyle, Thumbnail, Pagination, CalloutCard } from '@shopify/polaris'
-import styled from 'styled-components'
-import { withRouter } from 'react-router-dom'
-import PropTypes from 'prop-types'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import {
+  fetchUserProducts,
+  fetchAllProducts
+} from "../../actions/ProductActions";
+import {
+  Page,
+  Card,
+  ResourceList,
+  TextStyle,
+  Thumbnail,
+  Pagination,
+  EmptyState
+} from "@shopify/polaris";
+import emptyProducts from "../../assets/empty-products.svg";
+import styled from "styled-components";
+import { withRouter } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const PaginationFooter = styled.div`
   display: flex;
@@ -14,46 +26,43 @@ const PaginationFooter = styled.div`
 `;
 
 class Products extends Component {
-
   state = {
     page: 1,
     isLoaded: false,
     modalOpen: false,
-    modalType: '',
+    modalType: "",
     selectedItems: [],
-    searchValue: '',
+    searchValue: "",
     appliedFilters: []
-  }
+  };
 
-  componentDidMount(){
-    if(this.props.user.admin){
-      this.props.fetchAllProducts()
-      .then(() => {
-        this.setState({ isLoaded: true })
-      })
+  componentDidMount() {
+    if (this.props.user.admin) {
+      this.props.fetchAllProducts().then(() => {
+        this.setState({ isLoaded: true });
+      });
     } else {
-      this.props.fetchUserProducts(this.props.user.uid)
-      .then(() => {
-        this.setState({ isLoaded: true })
-      })
+      this.props.fetchUserProducts(this.props.user.uid).then(() => {
+        this.setState({ isLoaded: true });
+      });
     }
   }
 
-  handleSearchChange = (searchValue) => {
-    this.setState({searchValue});
+  handleSearchChange = searchValue => {
+    this.setState({ searchValue });
   };
 
-  handleFiltersChange = (appliedFilters) => {
-    this.setState({appliedFilters});
-    if(appliedFilters.length > 0){
-      this.props.fetchProducts({ limit: 50 }, appliedFilters)
+  handleFiltersChange = appliedFilters => {
+    this.setState({ appliedFilters });
+    if (appliedFilters.length > 0) {
+      this.props.fetchProducts({ limit: 50 }, appliedFilters);
     } else {
-      this.props.fetchProducts({ limit: 50 })
+      this.props.fetchProducts({ limit: 50 });
     }
   };
 
-  handleSelectionChange = (selectedItems) => {
-    this.setState({selectedItems});
+  handleSelectionChange = selectedItems => {
+    this.setState({ selectedItems });
   };
 
   onPrev = () => {
@@ -61,45 +70,47 @@ class Products extends Component {
     const limit = 50;
     const firstProduct = Object.keys(this.props.products)[0];
     const offset = this.props.products[firstProduct].created_at;
-    console.log(`end before ${firstProduct}`)
-    this.props.fetchProducts({ endBefore: offset, limit: limit })
-    .then(() => {
-      this.setState({ page: page - 1 })
-      if(page === 2){
-        this.props.history.push(`/products`)
+    console.log(`end before ${firstProduct}`);
+    this.props.fetchProducts({ endBefore: offset, limit: limit }).then(() => {
+      this.setState({ page: page - 1 });
+      if (page === 2) {
+        this.props.history.push(`/products`);
       } else {
-        this.props.history.push(`/products/page/${this.state.page}`)
+        this.props.history.push(`/products/page/${this.state.page}`);
       }
-    })
-  }
+    });
+  };
 
   onNext = () => {
     const { page } = this.state;
     const limit = 50;
     const lastProduct = Object.keys(this.props.products)[49];
     const offset = this.props.products[lastProduct].created_at;
-    console.log(`start after ${lastProduct}`)
-    this.props.fetchProducts({ startAfter: offset, limit: limit })
-    .then(() => {
-      this.setState({ page: page + 1 })
-      this.props.history.push(`/products/page/${this.state.page}`)
-    })
-  }
+    console.log(`start after ${lastProduct}`);
+    this.props.fetchProducts({ startAfter: offset, limit: limit }).then(() => {
+      this.setState({ page: page + 1 });
+      this.props.history.push(`/products/page/${this.state.page}`);
+    });
+  };
 
-  handleModalToggle = (type) => {
-    console.log('toggle modal')
-    this.setState({ modalOpen: !this.state.modalOpen, modalType: type })
-  }
+  handleModalToggle = type => {
+    console.log("toggle modal");
+    this.setState({ modalOpen: !this.state.modalOpen, modalType: type });
+  };
 
-  renderItem = (item) => {
-    const {product, title, created_at, image} = item;
+  renderItem = item => {
+    const { product, title, created_at, image } = item;
     const media = <Thumbnail alt={title} source={image} />;
 
     return (
       <ResourceList.Item
         id={created_at}
         media={media}
-        url={this.props.user.admin ? `/product/edit/${item.id}` : `/product/edit/${product}`}
+        url={
+          this.props.user.admin
+            ? `/product/edit/${item.id}`
+            : `/product/edit/${product}`
+        }
         accessibilityLabel={`View details for ${title}`}
       >
         <h3>
@@ -110,71 +121,62 @@ class Products extends Component {
   };
 
   render() {
-
     const resourceName = {
-      singular: 'product',
-      plural: 'products',
+      singular: "product",
+      plural: "products"
     };
 
     const promotedBulkActions = [
       {
-        content: 'Edit products',
-        onAction: () => this.handleModalToggle(),
-      },
+        content: "Edit products",
+        onAction: () => this.handleModalToggle()
+      }
     ];
 
     return (
       <Page
-        title='Products'
-        primaryAction={{content: 'Add Product', url: '/products/add'}}
+        title="Products"
+        primaryAction={{ content: "Add Product", url: "/products/add" }}
       >
-        <Card>
-          {this.state.isLoaded
-            ?
-              this.props.products.length > 0
-              ?
-                <>
-                  <ResourceList
-                    resourceName={resourceName}
-                    items={this.props.products}
-                    renderItem={this.renderItem}
-                    selectedItems={this.state.selectedItems}
-                    onSelectionChange={this.handleSelectionChange}
-                    promotedBulkActions={promotedBulkActions}
+        {this.state.isLoaded &&
+          (this.props.products.length > 0 ? (
+            <Card>
+              <ResourceList
+                resourceName={resourceName}
+                items={this.props.products}
+                renderItem={this.renderItem}
+                selectedItems={this.state.selectedItems}
+                onSelectionChange={this.handleSelectionChange}
+                promotedBulkActions={promotedBulkActions}
+              />
+              {this.props.products.length > 49 ? (
+                <PaginationFooter>
+                  <Pagination
+                    hasPrevious={this.state.page > 1}
+                    previousKeys={[74]}
+                    previousTooltip="j"
+                    onPrevious={this.onPrev}
+                    hasNext
+                    nextKeys={[75]}
+                    nextTooltip="k"
+                    onNext={this.onNext}
                   />
-                  {this.props.products.length > 49
-                    ?
-                      <PaginationFooter>
-                        <Pagination
-                            hasPrevious={this.state.page > 1}
-                            previousKeys={[74]}
-                            previousTooltip="j"
-                            onPrevious={this.onPrev}
-                            hasNext
-                            nextKeys={[75]}
-                            nextTooltip="k"
-                            onNext={this.onNext}
-                        />
-                      </PaginationFooter>
-                    :
-                      null
-                  }
-                </>
-              :
-              <CalloutCard
-                title="Add new products to your shop"
-                illustration="https://cdn.shopify.com/s/assets/admin/checkout/settings-customizecart-705f57c725ac05be5a34ec20c05b94298cb8afd10aac7bd9c7ad02030f48cfa0.svg"
-                primaryAction={{
-                  content: 'Add new product',
-                  url: '/products/add',
-                }}
-              >
-                <p>Add a new product for sale on your shop.</p>
-              </CalloutCard>
-            :
-              null
-          }
-        </Card>
+                </PaginationFooter>
+              ) : null}
+            </Card>
+          ) : (
+            <EmptyState
+              action={{ content: "Add product" }}
+              secondaryAction={{
+                content: "Learn more",
+                url: "/help"
+              }}
+              heading="Manage your products"
+              image={emptyProducts}
+            >
+              <p>Add and edit your available products for customers.</p>
+            </EmptyState>
+          ))}
       </Page>
     );
   }
@@ -185,9 +187,14 @@ Products.propTypes = {
   products: PropTypes.array.isRequired,
   fetchUserProducts: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired
-}
+};
 
-export default withRouter(connect((state, ownProps) => ({
-  products: state.products,
-  user: state.user
-}), { fetchUserProducts, fetchAllProducts })(Products));
+export default withRouter(
+  connect(
+    (state, ownProps) => ({
+      products: state.products,
+      user: state.user
+    }),
+    { fetchUserProducts, fetchAllProducts }
+  )(Products)
+);
