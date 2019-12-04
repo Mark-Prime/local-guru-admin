@@ -1,84 +1,84 @@
-import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
-import { Navigation } from '@shopify/polaris'
-import PropTypes from 'prop-types'
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+import { Navigation } from "@shopify/polaris";
+import PropTypes from "prop-types";
 
 const Section = Navigation.Section;
 
 class Nav extends Component {
-
-  render(){
+  render() {
     return (
       <Navigation location={this.props.location.pathname}>
         <Section
-          title='Admin'
+          title="Admin"
           items={[
             {
-              url: '/',
-              label: 'Home',
-              icon: 'home',
+              url: "/",
+              label: "Home",
+              icon: "home"
             },
             {
-              url: '/orders',
-              label: 'Orders',
-              icon: 'orders',
+              url: "/orders",
+              label: "Orders",
+              icon: "orders"
             },
             {
-              url: '/products',
-              label: 'Products',
-              icon: 'products',
+              url: "/products",
+              label: "Products",
+              icon: "products",
               subNavigationItems: [
                 {
-                  url: '/products',
-                  label: 'All Products'
+                  url: "/products",
+                  label: "All Products"
                 },
                 {
-                  url: '/products/add',
-                  label: 'Add New Product'
+                  url: "/products/add",
+                  label: "Add New Product"
                 }
               ]
             },
             {
-              url: '/analytics',
-              label: 'Analytics',
-              icon: 'view'
+              url: "/analytics",
+              label: "Analytics",
+              icon: "view"
             }
-        ]}
+          ]}
         />
         <Section
-          title='Content'
+          title="Content"
           separator
           items={[
             {
-              label: 'Home Page',
-              icon: 'notes'
+              label: "Home Page",
+              icon: "notes"
             },
             {
-              label: 'About Page',
-              icon: 'notes'
+              label: "About Page",
+              icon: "notes"
             }
-        ]}
-      />
+          ]}
+        />
         <Section
-          title='Settings'
+          title="Settings"
           separator
           items={[
             {
-              label: 'Sign Out',
-              icon: 'logOut',
+              label: "Sign Out",
+              icon: "logOut",
               onClick: () => {
-                  this.props.logout()
-                }
+                this.props.logout();
+                this.props.history.push("/");
+              }
             }
-        ]}
-      />
-    </Navigation>
-    )
+          ]}
+        />
+      </Navigation>
+    );
   }
 }
 
 Nav.propTypes = {
   location: PropTypes.object.isRequired
-}
+};
 
 export default withRouter(Nav);
