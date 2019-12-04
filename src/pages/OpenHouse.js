@@ -50,7 +50,7 @@ const OpenHouse = () => {
       >
         {user.open_house ? (
           <span>
-            <Moment format="dddd, MMMM Do YYYY, h a" date={user.open_house} />
+            <Moment format="dddd, MMMM Do YYYY" date={user.open_house} />
           </span>
         ) : (
           <OpenHousePicker
