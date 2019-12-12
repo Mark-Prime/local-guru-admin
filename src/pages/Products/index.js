@@ -166,7 +166,7 @@ class Products extends Component {
             </Card>
           ) : (
             <EmptyState
-              action={{ content: "Add product" }}
+              action={{ content: "Add product", url: "/products/add" }}
               secondaryAction={{
                 content: "Learn more",
                 url: "/help"

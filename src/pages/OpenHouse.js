@@ -9,6 +9,8 @@ const OpenHouse = () => {
   const user = useSelector(state => state.user);
 
   const [loading, setLoading] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(null);
   const [selectedDate, setSelectedDate] = useState({
     start: new Date()
   });
@@ -22,7 +24,7 @@ const OpenHouse = () => {
         .collection("producers")
         .doc(user.uid)
         .update({
-          open_house: selectedDate
+          open_house: { ...selectedDate, time: selectedTime }
         });
 
       const updatedUser = await db
@@ -31,6 +33,7 @@ const OpenHouse = () => {
         .get();
       dispatch({ type: "login_user", payload: updatedUser.data() });
       setLoading(true);
+      setFormOpen(false);
     } catch (err) {
       console.log(err);
     }
@@ -42,21 +45,34 @@ const OpenHouse = () => {
         title="Set Open house"
         sectioned
         primaryFooterAction={
-          !user.open_house && {
-            content: "Set date",
-            onAction: () => handleSubmit()
-          }
+          formOpen || !user.open_house
+            ? {
+                content: "Set date",
+                onAction: () => handleSubmit()
+              }
+            : {
+                content: "Change date",
+                onAction: () => setFormOpen(true)
+              }
         }
       >
-        {user.open_house ? (
+        {formOpen || !user.open_house ? (
           <span>
-            <Moment format="dddd, MMMM Do YYYY" date={user.open_house} />
+            <OpenHousePicker
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              selectedTime={selectedTime}
+              setSelectedTime={setSelectedTime}
+            />
           </span>
         ) : (
-          <OpenHousePicker
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
+          <>
+            <Moment
+              format="dddd, MMMM Do YYYY"
+              date={user.open_house.start.seconds * 1000}
+            />
+            <span> @ {user.open_house.time}</span>
+          </>
         )}
       </Card>
     </Page>
