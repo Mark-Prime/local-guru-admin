@@ -11,6 +11,7 @@ import {
   ViewMajorMonotone,
   SettingsMajorMonotone,
   InventoryMajorMonotone,
+  DisputeMinor,
   QuestionMarkMajorMonotone,
   LogOutMinor
 } from "@shopify/polaris-icons";
@@ -18,7 +19,7 @@ import { useSelector } from "react-redux";
 
 const Section = Navigation.Section;
 
-const Nav = () => {
+const Nav = ({ logout }) => {
   const user = useSelector(state => state.user);
   const { pathname } = useLocation();
 
@@ -34,7 +35,14 @@ const Nav = () => {
           {
             url: "/orders",
             label: "Orders",
-            icon: OrdersMajorMonotone
+            icon: OrdersMajorMonotone,
+            subNavigationItems: [
+              {
+                url: "/disputes",
+                icom: DisputeMinor,
+                label: "Disputes"
+              }
+            ]
           },
           {
             url: "/followers",
@@ -92,7 +100,7 @@ const Nav = () => {
             label: "Sign Out",
             icon: LogOutMinor,
             onClick: () => {
-              this.props.logout();
+              logout();
             }
           }
         ]}

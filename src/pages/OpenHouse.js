@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Page, Card } from "@shopify/polaris";
+import { Page, Card, TextStyle, TextContainer } from "@shopify/polaris";
 import OpenHousePicker from "../components/OpenHousePicker";
 import Moment from "react-moment";
 import { useSelector, useDispatch } from "react-redux";
@@ -56,6 +56,21 @@ const OpenHouse = () => {
               }
         }
       >
+        <TextContainer>
+          <p>
+            <TextStyle variation="subdued">
+              Once per month all sellers must host an “Open house” and allow
+              buyers and prospective buyers to see your merchandise before they
+              buy. The open house allows for sellers and buyers to establish a
+              connection and fuels trust between the parties. Buyers get a
+              chance to see not only what they are buying but also the
+              environment they are buying from. Open house also provides sellers
+              with an opportunity to highlight products and market their goods
+              in a new way.
+            </TextStyle>
+          </p>
+        </TextContainer>
+        <br />
         {formOpen || !user.open_house ? (
           <span>
             <OpenHousePicker
