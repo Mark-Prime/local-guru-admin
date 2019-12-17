@@ -36,6 +36,17 @@ const OpenHouse = () => {
     }
   };
 
+  const displayTimes = time => {
+    const startTime = Number(time.split(":")[0]);
+    const endTime = Number(time.split(":")[0]) + 2;
+
+    return `${startTime <= 12 ? startTime : startTime - 12}${
+      startTime <= 11 ? `AM` : `PM`
+    } to ${endTime <= 12 ? endTime : endTime - 12}${
+      endTime <= 11 ? `AM` : `PM`
+    }`;
+  };
+
   return (
     <Page title="Open House">
       <Card
@@ -83,7 +94,7 @@ const OpenHouse = () => {
               format="dddd, MMMM Do YYYY"
               date={user.open_house.start.seconds * 1000}
             />
-            <span> @ {user.open_house.time}</span>
+            <span> from {displayTimes(user.open_house.time)}</span>
           </>
         )}
       </Card>

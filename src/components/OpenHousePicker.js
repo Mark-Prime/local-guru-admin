@@ -25,7 +25,7 @@ const OpenHousePicker = ({
     { label: "8:00 AM - 10:00 AM", value: "8:00" },
     { label: "9:00 AM - 11:00 AM", value: "9:00" },
     { label: "10:00 AM - 12:00 PM", value: "10:00" },
-    { label: "11:00 AM - 11:00 AM", value: "11:00" },
+    { label: "11:00 AM - 1:00 PM", value: "11:00" },
     { label: "12:00 PM - 2:00 PM", value: "12:00" },
     { label: "1:00 PM - 3:00 PM", value: "13:00" },
     { label: "2:00 PM - 4:00 PM", value: "14:00" },
