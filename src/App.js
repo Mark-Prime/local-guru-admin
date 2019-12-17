@@ -20,6 +20,8 @@ import EditSingleProduct from "./pages/Products/Edit";
 import AddSingleProduct from "./pages/Products/AddSingleProduct";
 import { toggleToast } from "./actions/UIActions";
 import Settings from "./pages/Settings";
+import Terms from "./pages/Terms";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { getProducer, logoutUser } from "./actions/UserActions";
 import {
   fetchTransactions,
@@ -80,6 +82,8 @@ class App extends Component {
                   <Route path="/account" component={Settings} />
                   <Route path="/create-account" component={Register} />
                   <Route path="/open-house" component={OpenHouse} />
+                  <Route path="/terms" component={Terms} />
+                  <Route path="/privacy-policy" component={PrivacyPolicy} />
                   <Route path="/help" component={Help} />
                 </Switch>
               </Section>
@@ -90,6 +94,8 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={Login} />
               <Route path="/create-account" component={Register} />
+              <Route path="/terms" component={Terms} />
+              <Route path="/privacy-policy" component={PrivacyPolicy} />
             </Switch>
           </Layout>
         )}

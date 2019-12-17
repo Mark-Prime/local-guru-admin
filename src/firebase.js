@@ -1,8 +1,8 @@
-import { firebase } from '@firebase/app'
-import '@firebase/auth'
-import '@firebase/firestore'
-import '@firebase/functions'
-import '@firebase/storage'
+import { firebase } from "@firebase/app";
+import "@firebase/auth";
+import "@firebase/firestore";
+import "@firebase/functions";
+import "@firebase/storage";
 
 // Initialize Firebase
 const config = {
@@ -17,23 +17,23 @@ const config = {
 
 export const uiConfig = {
   // Popup signin flow rather than redirect flow.
-  signInFlow: 'popup',
+  signInFlow: "popup",
   // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: '/',
+  signInSuccessUrl: "/",
   // We will display Google and Facebook as auth providers.
   signInOptions: [
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     firebase.auth.FacebookAuthProvider.PROVIDER_ID,
     firebase.auth.EmailAuthProvider.PROVIDER_ID
   ],
-  tosUrl: 'https://local-guru-admin.netlify/terms' ,
-  privacyPolicyUrl: 'https://local-guru-admin.netlify/privacy-policy',
+  tosUrl: "/terms",
+  privacyPolicyUrl: "/privacy-policy",
   callbacks: {
-      // Avoid redirects after sign-in.
-      signInSuccessWithAuthResult: () => {
-        console.log('success!');
-      }
+    // Avoid redirects after sign-in.
+    signInSuccessWithAuthResult: () => {
+      console.log("success!");
     }
+  }
 };
 
 firebase.initializeApp(config);
