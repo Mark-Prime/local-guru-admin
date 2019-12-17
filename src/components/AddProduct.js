@@ -19,9 +19,7 @@ class AddProduct extends Component {
   render() {
     const {
       edit,
-      unit,
       units,
-      price,
       description,
       handleProductChoice,
       handleFocus,

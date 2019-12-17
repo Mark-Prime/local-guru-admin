@@ -86,10 +86,13 @@ const Nav = ({ logout }) => {
             icon: SettingsMajorMonotone
           },
           {
-            url: `https://local-guru-aeac9.firebaseapp.com/producer/${user.uid}`,
             label: "View your profile",
             icon: ViewMajorMonotone,
-            external: true
+            onClick: () => {
+              window.open(
+                `https://local-guru-aeac9.firebaseapp.com/producer/${user.uid}`
+              );
+            }
           },
           {
             url: "/help",

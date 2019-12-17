@@ -8,7 +8,6 @@ import { db } from "../firebase";
 const OpenHouse = () => {
   const user = useSelector(state => state.user);
 
-  const [loading, setLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedDate, setSelectedDate] = useState({
@@ -18,7 +17,6 @@ const OpenHouse = () => {
   const dispatch = useDispatch();
 
   const handleSubmit = async () => {
-    setLoading(true);
     try {
       await db
         .collection("producers")
@@ -32,7 +30,6 @@ const OpenHouse = () => {
         .doc(user.uid)
         .get();
       dispatch({ type: "login_user", payload: updatedUser.data() });
-      setLoading(true);
       setFormOpen(false);
     } catch (err) {
       console.log(err);

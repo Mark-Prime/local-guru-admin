@@ -7,7 +7,6 @@ import {
   ResourceList,
   TextStyle,
   Pagination,
-  Layout,
   Avatar,
   EmptyState
 } from "@shopify/polaris";
@@ -15,7 +14,6 @@ import Moment from "react-moment";
 import styled from "styled-components";
 import emptyOrders from "../../assets/empty-orders.svg";
 import { withRouter } from "react-router-dom";
-import OrderPreview from "../../components/OrderPreview";
 import OrderOverview from "../../components/OrderOverview";
 
 const PaginationFooter = styled.div`
@@ -127,6 +125,7 @@ class Orders extends Component {
       if (currentUserOrder) {
         // map through the items in the transaction
         Object.keys(transaction.items).map(item => {
+          console.log("item", item);
           let currentItem = currentUserOrder.items[item];
 
           // if the items already exists, add to it
@@ -147,7 +146,6 @@ class Orders extends Component {
       }
     });
 
-    console.log(orders);
     return Object.values(orders);
   };
 
@@ -198,16 +196,10 @@ class Orders extends Component {
         {this.state.isLoaded &&
         Object.keys(this.props.transactions).length > 0 ? (
           <>
-            <Layout>
-              <OrderPreview />
-            </Layout>
-            <br />
-            <br />
             <OrderOverview
               orders={this.props.transactions}
               user={this.props.user.uid}
             />
-            <br />
             <br />
             <Card>
               <ResourceList
