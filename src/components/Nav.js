@@ -35,6 +35,7 @@ const Nav = ({ logout }) => {
           {
             url: "/orders",
             label: "Orders",
+            badge: "1",
             icon: OrdersMajorMonotone,
             subNavigationItems: [
               {

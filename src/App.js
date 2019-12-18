@@ -14,6 +14,7 @@ import Help from "./pages/Help";
 import Register from "./pages/Register";
 import OpenHouse from "./pages/OpenHouse";
 import Orders from "./pages/Orders";
+import Disputes from "./pages/Orders/Disputes";
 import Followers from "./pages/Followers";
 import OrdersAdmin from "./pages/Orders/OrdersAdmin";
 import EditSingleProduct from "./pages/Products/Edit";
@@ -76,6 +77,7 @@ class App extends Component {
                     path="/orders"
                     component={this.props.user.admin ? OrdersAdmin : Orders}
                   />
+                  <Route path="/disputes" component={Disputes} />
                   <Route path="/followers" component={Followers} />
                   <Route path="/products/add" component={AddSingleProduct} />
                   <Route exact path="/products" component={Products} />
