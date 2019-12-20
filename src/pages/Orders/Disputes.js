@@ -21,17 +21,17 @@ const Disputes = () => {
     <Page title="Disputes">
       <TextContainer>
         <Stack>
-          <Link onClick={() => push("/disputes/awaiting-response")}>
-            <Heading>
-              <TextStyle variation="subdued">
-                Awaiting Response <Badge status="attention">1</Badge>
-              </TextStyle>
-            </Heading>
-          </Link>
           <Link onClick={() => push("/disputes/under-review")}>
             <Heading>
               <TextStyle variation="subdued">
                 Under Review <Badge status="info">1</Badge>
+              </TextStyle>
+            </Heading>
+          </Link>
+          <Link onClick={() => push("/disputes/awaiting-response")}>
+            <Heading>
+              <TextStyle variation="subdued">
+                Awaiting Response <Badge status="attention">1</Badge>
               </TextStyle>
             </Heading>
           </Link>

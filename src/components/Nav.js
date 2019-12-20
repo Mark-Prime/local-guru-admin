@@ -35,7 +35,6 @@ const Nav = ({ logout }) => {
           {
             url: "/orders",
             label: "Orders",
-            badge: "1",
             icon: OrdersMajorMonotone,
             subNavigationItems: [
               {
@@ -44,6 +43,12 @@ const Nav = ({ logout }) => {
                 label: "Disputes"
               }
             ]
+          },
+          {
+            url: "/disputes",
+            label: "Disputes",
+            badge: "2",
+            icon: DisputeMinor
           },
           {
             url: "/followers",
