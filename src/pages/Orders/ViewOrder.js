@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import { fetchSingleTransaction } from "../../actions/TransactionActions";
+import { fetchUserProducerTransaction } from "../../actions/TransactionActions";
 import {
   Page,
   Card,
@@ -10,25 +10,30 @@ import {
   Stack,
   Badge
 } from "@shopify/polaris";
+import { useSelector } from "react-redux";
 
 const ViewOrder = ({ match }) => {
   const [data, setData] = useState({});
 
+  const user = useSelector(state => state.user);
+
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetchSingleTransaction(match.params.id);
-      console.log(result);
+      const result = await fetchUserProducerTransaction(
+        match.params.id,
+        user.uid
+      );
       setData(result);
     };
 
     fetchData();
-  }, [match.params.id]);
+  }, [match.params.id, user.uid]);
 
   return (
     <div>
-      {typeof data.id !== "undefined" && (
+      {data.length > 0 && (
         <Page
-          title={`Order #${data.id.toUpperCase()}`}
+          title={`Order`}
           breadcrumbs={[{ content: "Orders", url: "/orders" }]}
           titleMetadata={<Badge status="success">Delivered</Badge>}
           secondaryActions={[{ content: "Print" }, { content: "Cancel order" }]}
@@ -37,9 +42,10 @@ const ViewOrder = ({ match }) => {
           <br />
           <Card title="Items" sectioned>
             <ResourceList
-              items={Object.values(data.items)}
+              items={data}
               renderItem={item => {
                 const { count, price, title, image, unit } = item;
+
                 const media = <Thumbnail source={image} alt={title} />;
 
                 return (
@@ -51,25 +57,12 @@ const ViewOrder = ({ match }) => {
                       <p>
                         {count} x {unit}
                       </p>
-                      <p>
-                        <TextStyle variation="strong">
-                          ${(price * count).toFixed(2)}
-                        </TextStyle>
-                      </p>
+                      <p>${(count * price).toFixed(2)}</p>
                     </Stack>
                   </ResourceList.Item>
                 );
               }}
             />
-            <Card.Section title="Total">
-              <p>Subtotal: ${data.total.toFixed(2)}</p>
-              <p>Shipping: {data.total >= 40 ? "FREE" : `$9.99`}</p>
-              {data.total >= 40 ? (
-                <p>Total: ${data.total.toFixed(2)}</p>
-              ) : (
-                <p>Total: ${data.total + 9.99}</p>
-              )}
-            </Card.Section>
           </Card>
         </Page>
       )}

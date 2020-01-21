@@ -125,7 +125,6 @@ class Orders extends Component {
       if (currentUserOrder) {
         // map through the items in the transaction
         Object.keys(transaction.items).map(item => {
-          console.log("item", item);
           let currentItem = currentUserOrder.items[item];
 
           // if the items already exists, add to it
@@ -142,7 +141,7 @@ class Orders extends Component {
 
         // If they don't add the first transaction
       } else {
-        orders = { [uid]: transaction };
+        orders = { ...orders, [uid]: transaction };
       }
     });
 
@@ -155,8 +154,14 @@ class Orders extends Component {
     return (
       <ResourceList.Item
         id={id}
-        media={<Avatar source={user.photoURL} name={user.displayName} />}
-        url={`/order/view/${id}`}
+        media={
+          <Avatar
+            customer
+            source={user.photoURL ? user.photoURL : null}
+            name={user.displayName}
+          />
+        }
+        url={`/order/view/${user.uid}`}
         accessibilityLabel={`View details for ${title}`}
       >
         <h3>
@@ -201,7 +206,7 @@ class Orders extends Component {
               user={this.props.user.uid}
             />
             <br />
-            <Card>
+            <Card title="Orders to be packaged" sectioned>
               <ResourceList
                 resourceName={resourceName}
                 items={this.transformTransactions(this.props.transactions)}
