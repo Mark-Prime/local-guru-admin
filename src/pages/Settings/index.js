@@ -19,6 +19,7 @@ import {
 } from "@shopify/polaris";
 import { ViewMajorMonotone } from "@shopify/polaris-icons";
 import Password from "./Password";
+import Email from "./Email";
 import PayoutCard from "./PayoutCard";
 
 const { Section } = Layout;
@@ -183,6 +184,7 @@ class Settings extends Component {
                   )}
                 </FormLayout>
               </Card>
+              <Email />
               <Password />
               <PayoutCard user={this.props.user} />
               <Card
