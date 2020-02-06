@@ -20,9 +20,10 @@ import {
 import { ViewMajorMonotone } from "@shopify/polaris-icons";
 import Password from "./Password";
 import Email from "./Email";
+import Business from "./Business";
 import PayoutCard from "./PayoutCard";
 
-const { Section } = Layout;
+const { AnnotatedSection } = Layout;
 
 class Settings extends Component {
   state = {
@@ -132,7 +133,10 @@ class Settings extends Component {
           ]}
         >
           <Layout>
-            <Section>
+            <AnnotatedSection
+              title="Bio"
+              description="Lorem ipsum dolor sit amet"
+            >
               <Card
                 title="Profile"
                 sectioned
@@ -184,9 +188,31 @@ class Settings extends Component {
                   )}
                 </FormLayout>
               </Card>
+            </AnnotatedSection>
+            <AnnotatedSection
+              title="Business details"
+              description="Lorem ipsum dolor sit amet"
+            >
+              <Business user={this.props.user} />
+            </AnnotatedSection>
+            <AnnotatedSection
+              title="Email"
+              description="Lorem ipsum dolor sit amet"
+            >
               <Email />
+            </AnnotatedSection>
+            <AnnotatedSection
+              title="Password"
+              description="Lorem ipsum dolor sit amet"
+            >
               <Password />
+            </AnnotatedSection>
+            <AnnotatedSection
+              title="Payment"
+              description="Lorem ipsum dolor sit amet"
+            >
               <PayoutCard user={this.props.user} />
+
               <Card
                 title="Bank"
                 sectioned
@@ -246,7 +272,7 @@ class Settings extends Component {
                   </p>
                 ) : null}
               </Card>
-            </Section>
+            </AnnotatedSection>
           </Layout>
         </Page>
       </div>
