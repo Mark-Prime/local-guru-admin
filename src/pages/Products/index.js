@@ -11,7 +11,8 @@ import {
   TextStyle,
   Thumbnail,
   Pagination,
-  EmptyState
+  EmptyState,
+  Link
 } from "@shopify/polaris";
 import emptyProducts from "../../assets/empty-products.svg";
 import styled from "styled-components";
@@ -133,37 +134,73 @@ class Products extends Component {
       }
     ];
 
+    // If the user has empty business details, disallow creating a product
+    let businessDetails = false;
+    if (this.props.user.businessDetails) {
+      const {
+        businessName,
+        fullName,
+        street,
+        city,
+        zip
+      } = this.props.user.businessDetails;
+
+      if (
+        businessName !== "" &&
+        fullName !== "" &&
+        street !== "" &&
+        zip !== "" &&
+        city !== ""
+      ) {
+        businessDetails = true;
+      }
+    }
+
     return (
       <Page
         title="Products"
-        primaryAction={{ content: "Add Product", url: "/products/add" }}
+        primaryAction={{
+          content: "Add Product",
+          url: "/products/add",
+          disabled: !businessDetails
+        }}
       >
         {this.state.isLoaded &&
           (this.props.products.length > 0 ? (
-            <Card>
-              <ResourceList
-                resourceName={resourceName}
-                items={this.props.products}
-                renderItem={this.renderItem}
-                selectedItems={this.state.selectedItems}
-                onSelectionChange={this.handleSelectionChange}
-                promotedBulkActions={promotedBulkActions}
-              />
-              {this.props.products.length > 49 ? (
-                <PaginationFooter>
-                  <Pagination
-                    hasPrevious={this.state.page > 1}
-                    previousKeys={[74]}
-                    previousTooltip="j"
-                    onPrevious={this.onPrev}
-                    hasNext
-                    nextKeys={[75]}
-                    nextTooltip="k"
-                    onNext={this.onNext}
-                  />
-                </PaginationFooter>
-              ) : null}
-            </Card>
+            <>
+              <>
+                {!businessDetails && (
+                  <Card sectioned title="Profile Incomplete">
+                    Your <Link to="/settings">Business details</Link> must be
+                    complete in order to create products
+                  </Card>
+                )}
+              </>
+              <Card>
+                <ResourceList
+                  resourceName={resourceName}
+                  items={this.props.products}
+                  renderItem={this.renderItem}
+                  selectedItems={this.state.selectedItems}
+                  onSelectionChange={this.handleSelectionChange}
+                  promotedBulkActions={promotedBulkActions}
+                />
+                {this.props.products.length > 49 ? (
+                  <PaginationFooter>
+                    <Pagination
+                      hasPrevious={this.state.page > 1}
+                      previousKeys={[74]}
+                      previousTooltip="j"
+                      onPrevious={this.onPrev}
+                      hasNext
+                      nextKeys={[75]}
+                      nextTooltip="k"
+                      onNext={this.onNext}
+                    />
+                  </PaginationFooter>
+                ) : null}
+              </Card>
+            </>
           ) : (
             <EmptyState
               action={{ content: "Add product", url: "/products/add" }}
