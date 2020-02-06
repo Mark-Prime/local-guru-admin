@@ -15,12 +15,14 @@ const Business = ({ user }) => {
   };
 
   const [values, setValues] = useState(user.businessDetails || defaultValues);
+  const [touched, setTouched] = useState(false);
 
   const handleTextField = useCallback((value, id) => {
     setValues(prevValues => ({
       ...prevValues,
       [id]: value
     }));
+    setTouched(true);
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -29,6 +31,7 @@ const Business = ({ user }) => {
       .update({
         businessDetails: values
       });
+    setTouched(false);
   }, [user.uid, values]);
 
   const { businessName, fullName, street, zip, apt, city } = values;
@@ -38,7 +41,8 @@ const Business = ({ user }) => {
       sectioned
       primaryFooterAction={{
         content: "Update Business details",
-        onAction: () => handleSubmit()
+        onAction: () => handleSubmit(),
+        disabled: !touched
       }}
     >
       <FormLayout>

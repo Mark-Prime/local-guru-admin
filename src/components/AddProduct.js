@@ -65,42 +65,42 @@ class AddProduct extends Component {
             <FormLayout>
               {units.map((item, index) => {
                 return (
-                  <TextField
-                    type="number"
-                    id="price"
-                    key={index}
-                    onFocus={handleFocus}
-                    label={`Option ${index + 1}`}
-                    min={0}
-                    labelAction={
-                      index > 0
-                        ? {
-                            content: "Remove",
-                            onAction: () => handleRemoveUnit(index)
+                  <FormLayout.Group>
+                    <TextField
+                      type="number"
+                      id="price"
+                      key={index}
+                      onFocus={handleFocus}
+                      label={`Option ${index + 1}`}
+                      min={0}
+                      labelAction={
+                        index > 0
+                          ? {
+                              content: "Remove",
+                              onAction: () => handleRemoveUnit(index)
+                            }
+                          : { content: "" }
+                      }
+                      onBlur={() => handleCurrencyBlur(index)}
+                      value={4}
+                      onChange={price =>
+                        handleChangeUnit(index, item.value, price)
+                      }
+                      connectedRight={
+                        <Select
+                          label="Weight unit"
+                          labelHidden
+                          onChange={value =>
+                            handleChangeUnit(index, value, item.price)
                           }
-                        : { content: "" }
-                    }
-                    onBlur={() => handleCurrencyBlur(index)}
-                    value={item.price}
-                    helpText={`You will receive $${(item.price * 0.8).toFixed(
-                      2
-                    )} per ${item.value} after fees`}
-                    onChange={price =>
-                      handleChangeUnit(index, item.value, price)
-                    }
-                    connectedRight={
-                      <Select
-                        label="Weight unit"
-                        labelHidden
-                        onChange={value =>
-                          handleChangeUnit(index, value, item.price)
-                        }
-                        value={item.value}
-                        options={["oz", "lb", "bunch", "each"]}
-                      />
-                    }
-                    prefix="$"
-                  />
+                          value={item.value}
+                          options={["oz", "lb", "bunch", "each"]}
+                        />
+                      }
+                      prefix="$"
+                    />
+                    <TextField type="number" id="max" label="Maximum order" />
+                  </FormLayout.Group>
                 );
               })}
             </FormLayout>

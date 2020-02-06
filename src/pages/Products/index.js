@@ -171,7 +171,7 @@ class Products extends Component {
               <>
                 {!businessDetails && (
                   <Card sectioned title="Profile Incomplete">
-                    Your <Link to="/settings">Business details</Link> must be
+                    Your <Link url="/account">Business details</Link> must be
                     complete in order to create products
                   </Card>
                 )}
