@@ -151,6 +151,16 @@ export function createProduct(title, category, tags, photo) {
   }
 }
 
+export function deleteProduct(user, id) {
+  console.log(`/products/${id}/producers/${user}`);
+  return db
+    .collection("products")
+    .doc(id)
+    .collection("producers")
+    .doc(user)
+    .delete();
+}
+
 export function editProduct(user, id, values, image, title, unit, units) {
   console.log("user", user);
   console.log("id", id);

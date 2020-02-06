@@ -1,11 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Page, Layout, Card } from "@shopify/polaris";
+import {
+  Page,
+  Layout,
+  Card,
+  Button,
+  ButtonGroup,
+  TextContainer,
+  Modal
+} from "@shopify/polaris";
 import {
   editProduct,
   fetchSingleProducerProduct,
   fetchSingleProduct,
-  createProduct
+  createProduct,
+  deleteProduct
 } from "../../actions/ProductActions";
 import { toggleToast } from "../../actions/UIActions";
 import { withRouter } from "react-router-dom";
@@ -25,6 +34,7 @@ class EditSingleProduct extends Component {
     isLoaded: false,
     touched: false,
     product: {},
+    modalOpen: false,
     category: "",
     unit: "oz",
     units: [],
@@ -198,6 +208,11 @@ class EditSingleProduct extends Component {
       });
   };
 
+  handleDelete = () => {
+    deleteProduct(this.props.user.uid, this.props.match.params.id);
+    this.props.history.push("/");
+  };
+
   render() {
     const { touched, unit, units } = this.state;
     const { title, description, image, price } = this.state.product;
@@ -243,6 +258,15 @@ class EditSingleProduct extends Component {
                     handleRemoveUnit={this.handleRemoveUnit}
                   />
                 )}
+                <br />
+                <ButtonGroup>
+                  <Button
+                    destructive
+                    onClick={() => this.setState({ modalOpen: true })}
+                  >
+                    Delete Product
+                  </Button>
+                </ButtonGroup>
               </Layout.Section>
               <Layout.Section secondary>
                 <Card sectioned>
@@ -254,6 +278,27 @@ class EditSingleProduct extends Component {
             </>
           )}
         </Layout>
+        <Modal
+          open={this.state.modalOpen}
+          title="Delete product?"
+          primaryAction={{
+            content: `Delete product`,
+            onAction: this.handleDelete
+          }}
+          secondaryActions={[
+            {
+              content: "Cancel",
+              onAction: () => this.setState({ modalOpen: false })
+            }
+          ]}
+          onClose={() => this.setState({ modalOpen: false })}
+        >
+          <Modal.Section>
+            <TextContainer>
+              <p>Are you sure you want to delete this product?</p>
+            </TextContainer>
+          </Modal.Section>
+        </Modal>
       </Page>
     );
   }
