@@ -20,7 +20,7 @@ code {
 }
 
 .InputContainer {
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 1rem;
 }
 
@@ -43,4 +43,5 @@ code {
   height: 100%;
   margin: 0;
   object-fit: cover;
+  width: 100%;
 }
