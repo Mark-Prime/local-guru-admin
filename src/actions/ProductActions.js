@@ -17,8 +17,6 @@ export function fetchAllProducts(user) {
           products = [doc.data(), ...products];
         });
 
-        console.log(products);
-
         return dispatch({
           type: FETCH_USER_PRODUCTS,
           payload: products
