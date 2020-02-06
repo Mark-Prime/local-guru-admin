@@ -29,15 +29,10 @@ export function fetchTransactions(producer) {
       .then(snapshot => {
         let transactions = [];
 
-        snapshot.docs.map(doc => {
-          const { items, user, created_at, total } = doc.data();
-
-          return transactions.push({
-            items: items,
-            created_at: created_at,
-            total: total,
-            user: user
-          });
+        snapshot.forEach(doc => {
+          const order = doc.data();
+          console.log(order);
+          transactions.push(order);
         });
 
         return dispatch({

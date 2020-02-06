@@ -17,7 +17,7 @@ import {
 } from "@shopify/polaris-icons";
 import { useSelector } from "react-redux";
 
-const Section = Navigation.Section;
+const { Section } = Navigation;
 
 const Nav = ({ logout }) => {
   const user = useSelector(state => state.user);

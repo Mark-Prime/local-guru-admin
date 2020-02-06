@@ -99,13 +99,9 @@ class Orders extends Component {
     let list = [];
 
     Object.keys(item.items).map((i, index) => {
-      const { count, producer, title } = item.items[i];
+      const { count, title } = item.items[i];
 
-      if (producer === this.props.user.uid) {
-        return (list[index] = `${title} x${count}`);
-      } else {
-        return false;
-      }
+      return (list[index] = `${title} x${count}`);
     });
 
     return list.join(", ");
@@ -115,8 +111,10 @@ class Orders extends Component {
     // create empty object
     let orders = {};
 
+    let arr = [...transactions];
+
     // Map through transactions array
-    transactions.forEach(transaction => {
+    arr.forEach(transaction => {
       // Get User ID
       const { uid } = transaction.user;
       let currentUserOrder = orders[uid];
@@ -128,13 +126,15 @@ class Orders extends Component {
           let currentItem = currentUserOrder.items[item];
 
           // if the items already exists, add to it
-          if (currentItem) {
+          if (currentItem?.items) {
             const newCount = currentItem.count + transaction.items[item].count;
+
             return (currentUserOrder.items = {
               ...currentUserOrder.items,
-              [item]: { count: newCount }
+              [item.count]: newCount
             });
           } else {
+            orders[uid].total = orders[uid].total + transaction.total;
             return (orders[uid].items[item] = transaction.items[item]);
           }
         });
@@ -176,7 +176,7 @@ class Orders extends Component {
         </p>
         <br />
         <p>
-          <strong>Total:</strong> ${this.orderTotal(item).toFixed(2)}
+          <strong>Total:</strong> ${item.total.toFixed(2)}
         </p>
         <p>
           <strong>Items:</strong>{" "}
@@ -234,7 +234,7 @@ class Orders extends Component {
           <EmptyState
             image={emptyOrders}
             heading="Manage Orders"
-            action={{ content: "Edit products" }}
+            action={{ content: "Edit products", url: "/products" }}
             secondaryAction={{ content: "Learn more", url: "/help" }}
           >
             Looks like you don't have any orders yet. Check back soon!

@@ -74,14 +74,11 @@ class AddSingleProduct extends Component {
 
   handleCurrencyBlur = index => {
     console.log(index);
-    const price = Number(this.state.units[index].price).toFixed(2);
-    console.log(price);
+    const price = this.state.units[index].price.toFixed(2);
 
     let units = this.state.units.slice();
 
-    units[index] = { ...units[index], price: price };
-
-    console.log(units[index].price);
+    units[index] = { ...units[index], price: Number(price) };
 
     this.setState({
       units: units
