@@ -82,7 +82,15 @@ const AddProduct = ({
                     }
                     prefix="$"
                   />
-                  <TextField type="number" id="max" label="Maximum order" />
+                  <TextField
+                    type="number"
+                    id="max"
+                    value={item.max}
+                    onChange={value =>
+                      handleChangeUnit(index, item.value, item.price, value)
+                    }
+                    label="Maximum order"
+                  />
                 </FormLayout.Group>
               );
             })}

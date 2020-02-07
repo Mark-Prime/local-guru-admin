@@ -27,7 +27,8 @@ const AddSingleProduct = () => {
   const [units, setUnits] = useState([
     {
       value: "lb",
-      price: "0"
+      price: "0",
+      max: ""
     }
   ]);
 
@@ -97,11 +98,11 @@ const AddSingleProduct = () => {
   );
 
   const handleChangeUnit = useCallback(
-    (index, value, price) => {
+    (index, value, price, max) => {
       // copy array
       const updatedUnits = units.slice();
       // edit array
-      updatedUnits[index] = { price: price, value: value };
+      updatedUnits[index] = { price: price, value: value, max: max };
       // set state with new array
       setUnits(updatedUnits);
     },
