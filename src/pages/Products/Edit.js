@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Page, Layout, Card } from "@shopify/polaris";
+import {
+  Page,
+  Layout,
+  Card,
+  ButtonGroup,
+  TextContainer,
+  Modal,
+  Button
+} from "@shopify/polaris";
 import AddProduct from "../../components/AddProduct";
 import styled from "styled-components";
 import { useHistory, useParams } from "react-router-dom";
@@ -21,6 +29,7 @@ const AddSingleProduct = () => {
     tags: []
   };
   const [touched, setTouched] = useState(false);
+  const [modal, setModal] = useState(false);
   const [selected, setSelected] = useState({ title: "", index: null });
   const [values, setValues] = useState(defaultValues);
   const [loaded, setLoaded] = useState(false);
@@ -68,13 +77,15 @@ const AddSingleProduct = () => {
 
       console.log(products);
 
-      setValues({
-        title: doc.data().title,
-        description: doc.data().description,
-        category: "veggies",
-        tags: doc.data().tags,
-        photo: doc.data().photo
-      });
+      if (products.title) {
+        setValues({
+          title: doc.data().title,
+          description: doc.data().description,
+          category: "veggies",
+          tags: doc.data().tags,
+          photo: doc.data().photo
+        });
+      }
 
       const index = products.findIndex(p => p.title === doc.data().title);
 
@@ -171,6 +182,7 @@ const AddSingleProduct = () => {
           name: user.displayName,
           uid: user.uid,
           image: image,
+          seasons: seasons,
           product: selected.id,
           photo: user.photoURL ? user.photoURL : "",
           units: units
@@ -181,6 +193,7 @@ const AddSingleProduct = () => {
     products,
     selected.index,
     selected.id,
+    seasons,
     user.uid,
     user.displayName,
     user.photoURL,
@@ -191,6 +204,16 @@ const AddSingleProduct = () => {
   const goBack = () => {
     history.goBack();
   };
+
+  const handleDelete = useCallback(() => {
+    const { id } = products[selected.index];
+    db.collection("products")
+      .doc(id)
+      .collection("producers")
+      .doc(user.uid)
+      .delete();
+    history.push("/products");
+  }, [history, products, selected.index, user.uid]);
 
   const handleSeason = useCallback(value => setSeasons(value), []);
 
@@ -231,6 +254,12 @@ const AddSingleProduct = () => {
               handleRemoveUnit={handleRemoveUnit}
             />
           )}
+          <br />
+          <ButtonGroup>
+            <Button destructive onClick={() => setModal(true)}>
+              Delete Product
+            </Button>
+          </ButtonGroup>
         </Layout.Section>
         <Layout.Section secondary>
           <Card sectioned>
@@ -247,6 +276,27 @@ const AddSingleProduct = () => {
           </Card>
         </Layout.Section>
       </Layout>
+      <Modal
+        open={modal}
+        sectioned
+        onClose={() => setModal(false)}
+        title="Delete product?"
+        primaryAction={{
+          content: "Delete product",
+          destructive: true,
+          onAction: handleDelete
+        }}
+        secondaryActions={[
+          {
+            content: "Cancel",
+            onAction: () => setModal(false)
+          }
+        ]}
+      >
+        <TextContainer>
+          <p>Are you sure you want to delete this product?</p>
+        </TextContainer>
+      </Modal>
     </Page>
   );
 };
