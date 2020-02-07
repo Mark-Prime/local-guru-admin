@@ -8,6 +8,8 @@ import {
   TextStyle,
   Pagination,
   Avatar,
+  Stack,
+  Thumbnail,
   EmptyState
 } from "@shopify/polaris";
 import Moment from "react-moment";
@@ -182,6 +184,32 @@ class Orders extends Component {
           <strong>Items:</strong>{" "}
           <TextStyle variation="subdued">{this.listItems(item)}</TextStyle>
         </p>
+        <br />
+        <Card title="Items" sectioned>
+          <ResourceList
+            items={Object.values(item.items)}
+            renderItem={item => {
+              console.log(item);
+              const { count, price, title, image, unit } = item;
+
+              const media = <Thumbnail source={image} alt={title} />;
+
+              return (
+                <ResourceList.Item media={media}>
+                  <Stack distribution="fillEvenly" spacing="extraLoose">
+                    <h3>
+                      <TextStyle variation="strong">{title}</TextStyle>
+                    </h3>
+                    <p>
+                      {count} x {unit}
+                    </p>
+                    <p>${(count * price).toFixed(2)}</p>
+                  </Stack>
+                </ResourceList.Item>
+              );
+            }}
+          />
+        </Card>
       </ResourceList.Item>
     );
   };

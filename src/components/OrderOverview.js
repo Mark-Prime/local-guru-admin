@@ -42,8 +42,8 @@ const getOverview = (orders, user) => {
 const OrderOverview = ({ orders, user }) => (
   <Card sectioned title="Overview">
     {orders.length > 0 &&
-      getOverview(orders, user).map(item => (
-        <Section key={item.title}>
+      getOverview(orders, user).map((item, index) => (
+        <Section key={index}>
           <Stack alignment="center">
             <Thumbnail size="large" source={item.image} alt={item.title} />
             <TextContainer>
