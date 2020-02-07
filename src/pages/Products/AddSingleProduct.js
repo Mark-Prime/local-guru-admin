@@ -4,6 +4,7 @@ import AddProduct from "../../components/AddProduct";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { db } from "../../firebase";
+import { useSelector } from "react-redux";
 
 const Image = styled.div`
   img {
@@ -33,6 +34,7 @@ const AddSingleProduct = () => {
   ]);
 
   const history = useHistory();
+  const user = useSelector(state => state.user);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -60,10 +62,10 @@ const AddSingleProduct = () => {
   const handleProductChoice = useCallback(
     selected => {
       const index = products.findIndex(p => p.title === selected[0]);
-      console.log(selected[0]);
 
       setSelected({
         index: index,
+        id: products[index].id,
         title: selected[0]
       });
       setTouched(true);
@@ -109,11 +111,45 @@ const AddSingleProduct = () => {
     [units]
   );
 
-  const handleSubmit = useCallback(() => {
-    const { selected } = values;
-    const { image, title, unit, id } = products[selected];
-    console.log(image, title, unit, id);
-  }, [products, values]);
+  const handleSubmit = useCallback(async () => {
+    const { image, title, id, producers } = products[selected.index];
+    console.log(producers);
+    db.collection("products")
+      .doc(id)
+      .set(
+        {
+          producers: [...producers, { [user.uid]: true }]
+        },
+        { merge: true }
+      );
+
+    db.collection("products")
+      .doc(id)
+      .collection("producers")
+      .doc(user.uid)
+      .set(
+        {
+          title: title,
+          description: values.description,
+          name: user.displayName,
+          uid: user.uid,
+          image: image,
+          product: selected.id,
+          photo: user.photoURL ? user.photoURL : "",
+          units: units
+        },
+        { merge: true }
+      );
+  }, [
+    products,
+    selected.index,
+    selected.id,
+    user.uid,
+    user.displayName,
+    user.photoURL,
+    values.description,
+    units
+  ]);
 
   const goBack = () => {
     history.goBack();

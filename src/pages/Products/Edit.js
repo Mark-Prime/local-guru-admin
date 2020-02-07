@@ -1,27 +1,10 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import {
-  Page,
-  Layout,
-  Card,
-  Button,
-  ButtonGroup,
-  TextContainer,
-  Modal
-} from "@shopify/polaris";
-import {
-  editProduct,
-  fetchSingleProducerProduct,
-  fetchSingleProduct,
-  createProduct,
-  deleteProduct
-} from "../../actions/ProductActions";
-import { toggleToast } from "../../actions/UIActions";
-import { withRouter } from "react-router-dom";
-import EditProduct from "../../components/EditProduct";
-import EditProductAdmin from "../../components/EditProductAdmin";
+import React, { useEffect, useState, useCallback } from "react";
+import { Page, Layout, Card } from "@shopify/polaris";
+import AddProduct from "../../components/AddProduct";
 import styled from "styled-components";
-import PropTypes from "prop-types";
+import { useHistory, useParams } from "react-router-dom";
+import { db } from "../../firebase";
+import { useSelector } from "react-redux";
 
 const Image = styled.div`
   img {
@@ -29,291 +12,233 @@ const Image = styled.div`
   }
 `;
 
-class EditSingleProduct extends Component {
-  state = {
-    isLoaded: false,
-    touched: false,
-    product: {},
-    modalOpen: false,
-    category: "",
-    unit: "oz",
-    units: [],
+const AddSingleProduct = () => {
+  const defaultValues = {
+    description: "",
+    title: "",
+    category: "veggies",
+    photo: "",
     tags: []
   };
-
-  componentDidMount() {
-    const { id } = this.props.match.params;
-
-    if (this.props.user.admin) {
-      fetchSingleProduct(id).then(product => {
-        this.setState({
-          product: product,
-          tags: product.tags,
-          category: product.category,
-          isLoaded: true
-        });
-      });
-    } else {
-      fetchSingleProducerProduct(id, this.props.user.uid).then(product => {
-        console.log(product.unit);
-        this.setState({
-          product: product,
-          unit: product.unit,
-          units: product.units,
-          isLoaded: true
-        });
-      });
+  const [touched, setTouched] = useState(false);
+  const [selected, setSelected] = useState({ title: "", index: null });
+  const [values, setValues] = useState(defaultValues);
+  const [loaded, setLoaded] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [units, setUnits] = useState([
+    {
+      value: "lb",
+      price: "0",
+      max: ""
     }
-  }
+  ]);
 
-  handleProductChoice = selected => {
-    this.setState({ selected: selected[0] });
-  };
+  const history = useHistory();
+  const user = useSelector(state => state.user);
+  const productId = useParams().id;
 
-  handleChangeTextField = (value, id) => {
-    console.log(value);
-    this.setState({ touched: true });
-    this.setState({ product: { ...this.state.product, [id]: value } });
-  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const array = [];
 
-  updateText = newValue => {
-    this.setState({ inputText: newValue });
-    this.filterAndUpdateOptions(newValue);
-  };
+      const docs = await db.collection("products").get();
 
-  handleFocus = e => {
+      docs.forEach(doc => {
+        array.push(doc.data());
+      });
+
+      console.log(array);
+
+      setProducts(array);
+    };
+
+    const fetchSingleProduct = async () => {
+      const doc = await db
+        .collection("products")
+        .doc(productId)
+        .collection("producers")
+        .doc(user.uid)
+        .get();
+
+      console.log(products);
+
+      setValues({
+        title: doc.data().title,
+        description: doc.data().description,
+        category: "veggies",
+        tags: doc.data().tags,
+        photo: doc.data().photo
+      });
+
+      const index = products.findIndex(p => p.title === doc.data().title);
+
+      if (index > -1) {
+        setSelected({
+          title: doc.data().title,
+          index: index
+        });
+        setUnits(doc.data().units);
+        setLoaded(true);
+      }
+    };
+
+    fetchProducts();
+    fetchSingleProduct();
+  }, [productId, products, user.uid]);
+
+  const handleFocus = e => {
     e.target.select();
   };
 
-  handleCategoryChange = value => {
-    console.log(value);
-    this.setState({ category: value, touched: true });
-  };
+  const handleProductChoice = useCallback(
+    selected => {
+      const index = products.findIndex(p => p.title === selected[0]);
 
-  handleCurrencyBlur = index => {
-    console.log(index);
-    const price = Number(this.state.units[index].price).toFixed(2);
-    console.log(price);
+      setSelected({
+        index: index,
+        id: products[index].id,
+        title: selected[0]
+      });
+      setTouched(true);
+    },
+    [products]
+  );
 
-    let units = this.state.units.slice();
+  const handleChangeTextField = useCallback((value, id) => {
+    setValues(prevValues => ({
+      ...prevValues,
+      [id]: value
+    }));
+  }, []);
 
-    units[index] = { ...units[index], price: price };
-
-    console.log(units[index].price);
-
-    this.setState({
-      units: units
-    });
-  };
-
-  handleChangeUnit = (index, value, price) => {
-    // copy array
-    const units = this.state.units.slice();
-    // edit array
-    units[index] = { price: price, value: value };
-    // set state with new array
-    this.setState({
-      units: units,
-      touched: true
-    });
-  };
-
-  handleAddUnit = () => {
-    // copy array
-    let units = this.state.units.slice();
+  const handleAddUnit = useCallback(() => {
     // check length
-    units = [...units, { value: "lb", price: 0 }];
+    let updatedUnits = [...units, { value: "lb", price: 0 }];
     // set state with new array
-    this.setState({ units: units, touched: true });
+    setUnits(updatedUnits);
+  }, [units]);
+
+  const handleRemoveUnit = useCallback(
+    index => {
+      // copy array
+      let updatedUnits = [...units];
+      // remove item
+      updatedUnits.splice(index, 1);
+      // set state with new array
+      setUnits(updatedUnits);
+    },
+    [units]
+  );
+
+  const handleChangeUnit = useCallback(
+    (index, value, price, max) => {
+      // copy array
+      const updatedUnits = units.slice();
+      // edit array
+      updatedUnits[index] = { price: price, value: value, max: max };
+      // set state with new array
+      setUnits(updatedUnits);
+    },
+    [units]
+  );
+
+  const handleSubmit = useCallback(async () => {
+    const { image, title, id, producers } = products[selected.index];
+    console.log(producers);
+    db.collection("products")
+      .doc(id)
+      .set(
+        {
+          producers: [...producers, { [user.uid]: true }]
+        },
+        { merge: true }
+      );
+
+    db.collection("products")
+      .doc(id)
+      .collection("producers")
+      .doc(user.uid)
+      .set(
+        {
+          title: title,
+          description: values.description,
+          name: user.displayName,
+          uid: user.uid,
+          image: image,
+          product: selected.id,
+          photo: user.photoURL ? user.photoURL : "",
+          units: units
+        },
+        { merge: true }
+      );
+  }, [
+    products,
+    selected.index,
+    selected.id,
+    user.uid,
+    user.displayName,
+    user.photoURL,
+    values.description,
+    units
+  ]);
+
+  const goBack = () => {
+    history.goBack();
   };
 
-  handleRemoveUnit = index => {
-    console.log(index);
-    // copy array
-    const units = this.state.units.slice();
-    // remove item
-    units.splice(index, 1);
-    // set state with new array
-    this.setState({ units: units, touched: true });
-  };
+  const handleCurrencyBlur = useCallback(value => {
+    return value;
+  }, []);
 
-  handleSubmit = () => {
-    const { product, unit, units } = this.state;
-    const { user } = this.props;
-    const { image, title, description, price } = product;
-    const { id } = this.props.match.params;
+  const { title, description } = values;
 
-    const values = {
-      description: description,
-      price: price
-    };
-
-    editProduct(user, id, values, image, title, unit, units)
-      .then(() => {
-        fetchSingleProducerProduct(id, this.props.user.uid).then(product => {
-          this.setState({
-            product: product,
-            isLoaded: true,
-            touched: false
-          });
-        });
-      })
-      .then(() => {
-        this.props.toggleToast("Product updated");
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  goBack = () => {
-    this.props.history.goBack();
-  };
-
-  handleUpload = file => {
-    this.setState({ photo: file });
-  };
-
-  handleSelectChange = value => {
-    this.setState({ category: value });
-  };
-
-  handleAddTag = tag => {
-    const newTags = [...this.state.tags, tag];
-    this.setState({ tags: newTags, touched: true });
-  };
-
-  handleRemoveTag = index => {
-    const tags = [...this.state.tags];
-    const newTags = tags.splice(index, 1);
-    console.log(newTags);
-    this.setState({ tags: newTags, touched: true });
-  };
-
-  handleSubmitAdmin = () => {
-    const { tags, category } = this.state;
-    const { title } = this.state.product;
-
-    createProduct(title, category, tags)
-      .then(id => {
-        fetchSingleProduct(id).then(product => {
-          this.setState({
-            isLoaded: true,
-            touched: false
-          });
-        });
-      })
-      .then(() => {
-        this.props.toggleToast("Product updated");
-      });
-  };
-
-  handleDelete = () => {
-    deleteProduct(this.props.user.uid, this.props.match.params.id);
-    this.props.history.push("/");
-  };
-
-  render() {
-    const { touched, unit, units } = this.state;
-    const { title, description, image, price } = this.state.product;
-
-    return (
-      <Page
-        breadcrumbs={[{ content: "Products", onAction: this.goBack }]}
-        title={title}
-        primaryAction={{
-          content: "Save",
-          disabled: !touched,
-          onAction: this.props.user.admin
-            ? this.handleSubmitAdmin
-            : this.handleSubmit
-        }}
-      >
-        <Layout>
-          {this.state.isLoaded && (
-            <>
-              <Layout.Section>
-                {this.props.user.admin ? (
-                  <EditProductAdmin
-                    title={title}
-                    handleChangeTextField={this.handleChangeTextField}
-                    category={this.state.category}
-                    tags={this.state.tags}
-                    handleCategoryChange={this.handleCategoryChange}
-                    handleAddTag={this.handleAddTag}
-                    handleRemoveTag={this.handleRemoveTag}
-                  />
-                ) : (
-                  <EditProduct
-                    title={title}
-                    description={description}
-                    price={price}
-                    unit={unit}
-                    units={units}
-                    handleChangeTextField={this.handleChangeTextField}
-                    handleFocus={this.handleFocus}
-                    handleCurrencyBlur={this.handleCurrencyBlur}
-                    handleChangeUnit={this.handleChangeUnit}
-                    handleAddUnit={this.handleAddUnit}
-                    handleRemoveUnit={this.handleRemoveUnit}
+  return (
+    <Page
+      breadcrumbs={[{ content: "Products", onAction: goBack }]}
+      title="Add Product"
+      primaryAction={{
+        content: "Save",
+        disabled: !touched,
+        onAction: handleSubmit
+      }}
+    >
+      <Layout>
+        <Layout.Section>
+          {loaded && (
+            <AddProduct
+              products={products}
+              title={title}
+              selected={selected}
+              description={description}
+              units={units}
+              handleProductChoice={handleProductChoice}
+              handleChangeTextField={handleChangeTextField}
+              handleSelectChange={handleChangeTextField}
+              handleFocus={handleFocus}
+              handleCurrencyBlur={handleCurrencyBlur}
+              handleChangeUnit={handleChangeUnit}
+              handleAddUnit={handleAddUnit}
+              handleRemoveUnit={handleRemoveUnit}
+            />
+          )}
+        </Layout.Section>
+        <Layout.Section secondary>
+          <Card sectioned>
+            <Image>
+              <>
+                {selected.index && (
+                  <img
+                    src={products[selected.index].image}
+                    alt={products[selected.index].title}
                   />
                 )}
-                <br />
-                <ButtonGroup>
-                  <Button
-                    destructive
-                    onClick={() => this.setState({ modalOpen: true })}
-                  >
-                    Delete Product
-                  </Button>
-                </ButtonGroup>
-              </Layout.Section>
-              <Layout.Section secondary>
-                <Card sectioned>
-                  <Image>
-                    <img src={image} alt={title} />
-                  </Image>
-                </Card>
-              </Layout.Section>
-            </>
-          )}
-        </Layout>
-        <Modal
-          open={this.state.modalOpen}
-          title="Delete product?"
-          primaryAction={{
-            content: `Delete product`,
-            onAction: this.handleDelete
-          }}
-          secondaryActions={[
-            {
-              content: "Cancel",
-              onAction: () => this.setState({ modalOpen: false })
-            }
-          ]}
-          onClose={() => this.setState({ modalOpen: false })}
-        >
-          <Modal.Section>
-            <TextContainer>
-              <p>Are you sure you want to delete this product?</p>
-            </TextContainer>
-          </Modal.Section>
-        </Modal>
-      </Page>
-    );
-  }
-}
-
-EditSingleProduct.propTypes = {
-  user: PropTypes.object.isRequired,
-  toggleToast: PropTypes.func.isRequired
+              </>
+            </Image>
+          </Card>
+        </Layout.Section>
+      </Layout>
+    </Page>
+  );
 };
 
-export default withRouter(
-  connect(
-    (state, ownProps) => ({
-      user: state.user
-    }),
-    { toggleToast }
-  )(EditSingleProduct)
-);
+export default AddSingleProduct;

@@ -89,6 +89,7 @@ const AddProduct = ({
                     onChange={value =>
                       handleChangeUnit(index, item.value, item.price, value)
                     }
+                    suffix={item.value}
                     label="Maximum order"
                   />
                 </FormLayout.Group>
