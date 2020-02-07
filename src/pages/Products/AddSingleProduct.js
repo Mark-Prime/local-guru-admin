@@ -25,6 +25,12 @@ const AddSingleProduct = () => {
   const [values, setValues] = useState(defaultValues);
   const [loaded, setLoaded] = useState(false);
   const [products, setProducts] = useState([]);
+  const [seasons, setSeasons] = useState([
+    "spring",
+    "summer",
+    "fall",
+    "winter"
+  ]);
   const [units, setUnits] = useState([
     {
       value: "lb",
@@ -45,8 +51,6 @@ const AddSingleProduct = () => {
       docs.forEach(doc => {
         array.push(doc.data());
       });
-
-      console.log(array);
 
       setProducts(array);
       setLoaded(true);
@@ -113,7 +117,6 @@ const AddSingleProduct = () => {
 
   const handleSubmit = useCallback(async () => {
     const { image, title, id, producers } = products[selected.index];
-    console.log(producers);
     db.collection("products")
       .doc(id)
       .set(
@@ -136,7 +139,8 @@ const AddSingleProduct = () => {
           image: image,
           product: selected.id,
           photo: user.photoURL ? user.photoURL : "",
-          units: units
+          units: units,
+          seasons: seasons
         },
         { merge: true }
       );
@@ -145,6 +149,7 @@ const AddSingleProduct = () => {
     selected.index,
     selected.id,
     user.uid,
+    seasons,
     user.displayName,
     user.photoURL,
     values.description,
@@ -154,6 +159,8 @@ const AddSingleProduct = () => {
   const goBack = () => {
     history.goBack();
   };
+
+  const handleSeason = useCallback(value => setSeasons(value), []);
 
   const handleCurrencyBlur = useCallback(value => {
     return value;
@@ -180,6 +187,8 @@ const AddSingleProduct = () => {
               selected={selected}
               description={description}
               units={units}
+              seasons={seasons}
+              handleSeason={handleSeason}
               handleProductChoice={handleProductChoice}
               handleChangeTextField={handleChangeTextField}
               handleSelectChange={handleChangeTextField}

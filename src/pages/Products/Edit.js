@@ -25,6 +25,12 @@ const AddSingleProduct = () => {
   const [values, setValues] = useState(defaultValues);
   const [loaded, setLoaded] = useState(false);
   const [products, setProducts] = useState([]);
+  const [seasons, setSeasons] = useState([
+    "spring",
+    "summer",
+    "fall",
+    "winter"
+  ]);
   const [units, setUnits] = useState([
     {
       value: "lb",
@@ -186,6 +192,8 @@ const AddSingleProduct = () => {
     history.goBack();
   };
 
+  const handleSeason = useCallback(value => setSeasons(value), []);
+
   const handleCurrencyBlur = useCallback(value => {
     return value;
   }, []);
@@ -211,6 +219,8 @@ const AddSingleProduct = () => {
               selected={selected}
               description={description}
               units={units}
+              seasons={seasons}
+              handleSeason={handleSeason}
               handleProductChoice={handleProductChoice}
               handleChangeTextField={handleChangeTextField}
               handleSelectChange={handleChangeTextField}
