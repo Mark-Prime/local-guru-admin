@@ -31,7 +31,6 @@ export function fetchTransactions(producer) {
 
         snapshot.forEach(doc => {
           const order = doc.data();
-          console.log(order);
           transactions.push(order);
         });
 

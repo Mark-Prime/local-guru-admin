@@ -1,7 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "@shopify/polaris";
-import PropTypes from "prop-types";
 import {
   HomeMajorMonotone,
   ProductsMajorMonotone,
@@ -116,10 +115,6 @@ const Nav = ({ logout }) => {
       />
     </Navigation>
   );
-};
-
-Nav.propTypes = {
-  location: PropTypes.object.isRequired
 };
 
 export default Nav;

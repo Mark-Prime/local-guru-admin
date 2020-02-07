@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, TextField, FormLayout } from "@shopify/polaris";
 import { db } from "../../firebase";
 

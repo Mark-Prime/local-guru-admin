@@ -1,46 +1,46 @@
-import React, { Component } from "react";
+import React, { useState, useCallback } from "react";
 import { connectAutoComplete } from "react-instantsearch-dom";
 import { Autocomplete, Icon } from "@shopify/polaris";
 import { SearchMajorMonotone } from "@shopify/polaris-icons";
 
-class ProductSearch extends Component {
-  state = {
-    inputText: ""
-  };
+const ProductSearch = ({ refine, onSelect, hits, selected }) => {
+  const [inputText, setInputText] = useState("");
 
-  handleChange = value => {
-    this.setState({ inputText: value });
-    this.props.refine(value);
-  };
+  const handleChange = useCallback(
+    value => {
+      setInputText(value);
+      refine(value);
+    },
+    [refine]
+  );
 
-  handleSelect = value => {
-    this.setState({ inputText: value });
-    this.props.onSelect(value);
-  };
+  const handleSelect = useCallback(
+    value => {
+      setInputText(value[0]);
+      onSelect(value);
+    },
+    [onSelect]
+  );
 
-  render() {
-    const { hits, selected } = this.props;
+  const textField = (
+    <Autocomplete.TextField
+      onChange={handleChange}
+      label="Product"
+      value={inputText}
+      autoComplete="autocomplete_off_hack_xfr4!k"
+      prefix={<Icon source={SearchMajorMonotone} color="inkLighter" />}
+      placeholder="Search"
+    />
+  );
 
-    const textField = (
-      <Autocomplete.TextField
-        onChange={this.handleChange}
-        label="Product"
-        value={this.state.inputText}
-        autoComplete="autocomplete_off_hack_xfr4!k"
-        prefix={<Icon source={SearchMajorMonotone} color="inkLighter" />}
-        placeholder="Search"
-      />
-    );
-
-    return (
-      <Autocomplete
-        options={hits.map(hit => ({ label: hit.title, value: hit.title }))}
-        selected={selected}
-        onSelect={this.handleSelect}
-        textField={textField}
-      />
-    );
-  }
-}
+  return (
+    <Autocomplete
+      options={hits.map(hit => ({ label: hit.title, value: hit.title }))}
+      selected={[selected.title]}
+      onSelect={handleSelect}
+      textField={textField}
+    />
+  );
+};
 
 export default connectAutoComplete(ProductSearch);
