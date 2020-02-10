@@ -99,9 +99,15 @@ const AddSingleProduct = () => {
       }
     };
 
-    fetchProducts();
-    fetchSingleProduct();
-  }, [productId, products, user.uid]);
+    if (products.length < 1) {
+      console.log("length zero");
+      fetchProducts();
+    }
+
+    if (selected.title === "") {
+      fetchSingleProduct();
+    }
+  }, [productId, products, selected.title, user.uid]);
 
   const handleFocus = e => {
     e.target.select();
@@ -161,7 +167,6 @@ const AddSingleProduct = () => {
 
   const handleSubmit = useCallback(async () => {
     const { image, title, id, producers } = products[selected.index];
-    console.log(producers);
     db.collection("products")
       .doc(id)
       .set(
@@ -182,10 +187,10 @@ const AddSingleProduct = () => {
           name: user.displayName,
           uid: user.uid,
           image: image,
-          seasons: seasons,
           product: selected.id,
           photo: user.photoURL ? user.photoURL : "",
-          units: units
+          units: units,
+          seasons: seasons
         },
         { merge: true }
       );
@@ -193,8 +198,8 @@ const AddSingleProduct = () => {
     products,
     selected.index,
     selected.id,
-    seasons,
     user.uid,
+    seasons,
     user.displayName,
     user.photoURL,
     values.description,
@@ -204,6 +209,10 @@ const AddSingleProduct = () => {
   const goBack = () => {
     history.goBack();
   };
+
+  const handleCurrencyBlur = useCallback(value => {
+    return value;
+  }, []);
 
   const handleDelete = useCallback(() => {
     const { id } = products[selected.index];
@@ -215,10 +224,9 @@ const AddSingleProduct = () => {
     history.push("/products");
   }, [history, products, selected.index, user.uid]);
 
-  const handleSeason = useCallback(value => setSeasons(value), []);
-
-  const handleCurrencyBlur = useCallback(value => {
-    return value;
+  const handleSeason = useCallback(value => {
+    setSeasons(value);
+    setTouched(true);
   }, []);
 
   const { title, description } = values;
