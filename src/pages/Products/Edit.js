@@ -161,6 +161,7 @@ const AddSingleProduct = () => {
       updatedUnits[index] = { price: price, value: value, max: max };
       // set state with new array
       setUnits(updatedUnits);
+      setTouched(true);
     },
     [units]
   );
@@ -187,7 +188,7 @@ const AddSingleProduct = () => {
           name: user.displayName,
           uid: user.uid,
           image: image,
-          product: selected.id,
+          product: productId,
           photo: user.photoURL ? user.photoURL : "",
           units: units,
           seasons: seasons
@@ -197,13 +198,13 @@ const AddSingleProduct = () => {
   }, [
     products,
     selected.index,
-    selected.id,
     user.uid,
-    seasons,
     user.displayName,
     user.photoURL,
     values.description,
-    units
+    productId,
+    units,
+    seasons
   ]);
 
   const goBack = () => {

@@ -135,7 +135,7 @@ class Settings extends Component {
           <Layout>
             <AnnotatedSection
               title="Bio"
-              description="Lorem ipsum dolor sit amet"
+              description="Your account and contact information."
             >
               <Card
                 title="Profile"
@@ -191,25 +191,25 @@ class Settings extends Component {
             </AnnotatedSection>
             <AnnotatedSection
               title="Business details"
-              description="Lorem ipsum dolor sit amet"
+              description="This address will appear on your invoices and be available to customers for open houses"
             >
               <Business user={this.props.user} />
             </AnnotatedSection>
             <AnnotatedSection
               title="Email"
-              description="Lorem ipsum dolor sit amet"
+              description="Local Guru will use this information to contact you."
             >
               <Email />
             </AnnotatedSection>
             <AnnotatedSection
               title="Password"
-              description="Lorem ipsum dolor sit amet"
+              description="This password is used to login to the admin area."
             >
               <Password />
             </AnnotatedSection>
             <AnnotatedSection
               title="Payment"
-              description="Lorem ipsum dolor sit amet"
+              description="This information will be used for your payouts."
             >
               <PayoutCard user={this.props.user} />
 

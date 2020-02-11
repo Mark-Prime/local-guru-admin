@@ -28,7 +28,6 @@ const AddProduct = ({
   handleSubmit,
   handleRemoveUnit
 }) => {
-  console.log(seasons);
   return (
     <Card>
       <Form onSubmit={handleSubmit}>
@@ -105,6 +104,7 @@ const AddProduct = ({
                       type="number"
                       id="max"
                       value={item.max}
+                      min={0}
                       onChange={value =>
                         handleChangeUnit(index, item.value, item.price, value)
                       }
