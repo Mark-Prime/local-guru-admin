@@ -10,7 +10,8 @@ import {
   Pagination,
   EmptyState,
   Link,
-  Modal
+  Modal,
+  TextContainer
 } from "@shopify/polaris";
 import { db } from "../../firebase";
 import emptyProducts from "../../assets/empty-products.svg";
@@ -45,7 +46,7 @@ const Products = () => {
       if (!snapshot.empty) {
         snapshot.forEach(doc => {
           if (doc.data().product) {
-            array = [{ id: doc.data().uid, ...doc.data() }, ...array];
+            array = [{ id: doc.data().product, ...doc.data() }, ...array];
           }
         });
 
@@ -56,8 +57,10 @@ const Products = () => {
       }
     };
 
-    fetchUserProducts();
-  }, [user]);
+    if (!loaded) {
+      fetchUserProducts();
+    }
+  }, [user, loaded]);
 
   // const handleSearchChange = useCallback(searchValue => {
   //   setSearchValue(searchValue);
@@ -67,6 +70,19 @@ const Products = () => {
     console.log(selection);
     setSelectedItems(selection);
   }, []);
+
+  const handleDelete = useCallback(() => {
+    selectedItems.map(id => {
+      return db
+        .collection("products")
+        .doc(id)
+        .collection("producers")
+        .doc(user.uid)
+        .delete();
+    });
+    setModal(false);
+    setLoaded(false);
+  }, [selectedItems, user.uid]);
 
   const onPrev = useCallback(() => {
     const { page } = this.state;
@@ -96,18 +112,17 @@ const Products = () => {
     });
   }, [history, page, products]);
 
-  const handleModalToggle = useCallback(type => {
-    setModal(modal => !modal);
-  }, []);
+  // const handleModalToggle = useCallback(type => {
+  //   setModal(modal => !modal);
+  // }, []);
 
   const renderItem = useCallback(item => {
-    console.log(item);
-    const { product, title, uid, image } = item;
+    const { product, title, image } = item;
     const media = <Thumbnail alt={title} source={image} />;
 
     return (
       <ResourceList.Item
-        id={uid}
+        id={product}
         media={media}
         url={`/product/edit/${product}`}
         accessibilityLabel={`View details for ${title}`}
@@ -126,7 +141,8 @@ const Products = () => {
 
   const promotedBulkActions = [
     {
-      content: "Delete"
+      content: selectedItems.length > 1 ? `Delete products` : `Delete product`,
+      onAction: () => setModal(true)
     }
   ];
 
@@ -205,7 +221,35 @@ const Products = () => {
             <p>Add and edit your available products for customers.</p>
           </EmptyState>
         ))}
-      <Modal open={modal}></Modal>
+      <Modal
+        open={modal}
+        sectioned
+        onClose={() => setModal(false)}
+        title={
+          selectedItems.length > 1
+            ? `Delete ${selectedItems.length} products?`
+            : `Delete 1 product?`
+        }
+        primaryAction={{
+          content: "Delete product",
+          destructive: true,
+          onAction: handleDelete
+        }}
+        secondaryActions={[
+          {
+            content: "Cancel",
+            onAction: () => setModal(false)
+          }
+        ]}
+      >
+        <TextContainer>
+          {selectedItems.length > 1 ? (
+            <p>Are you sure you want to delete these products?</p>
+          ) : (
+            <p>Are you sure you want to delete this product?</p>
+          )}
+        </TextContainer>
+      </Modal>
     </Page>
   );
 };
