@@ -10,6 +10,7 @@ const Business = ({ user }) => {
     fullName: "",
     street: "",
     zip: "",
+    phone: "",
     apt: "",
     city: "Minneapolis"
   };
@@ -34,7 +35,7 @@ const Business = ({ user }) => {
     setTouched(false);
   }, [user.uid, values]);
 
-  const { businessName, fullName, street, zip, apt, city } = values;
+  const { businessName, fullName, street, zip, apt, city, phone } = values;
 
   return (
     <Card
@@ -57,6 +58,14 @@ const Business = ({ user }) => {
             label="Your full name"
             id="fullName"
             value={fullName}
+            onChange={handleTextField}
+          />
+          <TextField
+            label="Phone number"
+            id="phone"
+            value={phone}
+            maxLength={10}
+            type="tel"
             onChange={handleTextField}
           />
         </Group>
