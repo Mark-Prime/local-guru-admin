@@ -9,11 +9,17 @@ const AnalyticBlock = ({ data, title, text, currency, change }) => (
         {data}
       </DisplayText>
       <br />
-      <TextStyle variation={change > 0 ? "positive" : "negative"}>
-        {change > 0
-          ? `Up ${Math.abs(change)}% from last week`
-          : `Down ${Math.abs(change)}% from last week`}
-      </TextStyle>
+      {change ? (
+        <TextStyle variation={change > 0 ? "positive" : "negative"}>
+          {change > 0
+            ? `Up ${Math.abs(change)}% from last week`
+            : `Down ${Math.abs(change)}% from last week`}
+        </TextStyle>
+      ) : (
+        <TextStyle variation="subdued">
+          This is your first week of data
+        </TextStyle>
+      )}
     </TextContainer>
   </Card>
 );

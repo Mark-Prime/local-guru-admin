@@ -27,12 +27,6 @@ class Home extends Component {
             </DisplayText>
           </TextStyle>
           <br />
-          <br />
-          <Layout>
-            <OrderPreview />
-          </Layout>
-          <br />
-          <br />
           <CalloutCard
             title="Set up your profile"
             illustration="https://apps.shopify.com/assets/v2/category-images/marketing-addb6d46025cb3e65cac1fbf8a56c248739dc20d0606d8550b217d11574f44fe.svg"

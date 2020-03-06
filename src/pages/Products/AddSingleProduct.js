@@ -144,8 +144,10 @@ const AddSingleProduct = () => {
         },
         { merge: true }
       );
+    history.push("/products");
   }, [
     products,
+    history,
     selected.index,
     selected.id,
     user.uid,
