@@ -92,7 +92,7 @@ const Analytics = () => {
             </Section>
             <Section oneThird>
               <AnalyticBlock
-                data={views.current}
+                data={followers.current}
                 change={
                   followers.past
                     ? 0 && (followers.current - followers.past) / followers.past

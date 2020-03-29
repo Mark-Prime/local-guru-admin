@@ -63,8 +63,6 @@ const useAnalytics = (user, range) => {
           .limit(range === "month" ? 30 : range === "year" ? 365 : 7)
           .get();
 
-        console.log(views);
-
         views.docs.map(doc => {
           const { count } = doc.data();
           console.log(count);
@@ -83,8 +81,7 @@ const useAnalytics = (user, range) => {
           .endAt(endDate)
           .get();
 
-        console.log(followers.docs);
-
+        setFollowers({ current: followers.docs.length, past: 0 });
         setOrders({ current: data.docs.length, past: 0 });
         setLoaded(true);
       } catch (err) {
