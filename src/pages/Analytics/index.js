@@ -9,17 +9,13 @@ const { Section } = Layout;
 
 const Analytics = () => {
   const [selected, setSelected] = useState(0);
+  const [range, setRange] = useState("week");
 
   const user = useSelector(state => state.user);
 
-  const { loaded, error, sales, orders, views, followers } = useAnalytics(
+  const { loaded, products, sales, orders, views, followers } = useAnalytics(
     user.uid,
     selected
-  );
-
-  const handleTabChange = useCallback(
-    selectedTabIndex => setSelected(selectedTabIndex),
-    []
   );
 
   const tabs = [
@@ -46,6 +42,15 @@ const Analytics = () => {
     }
   ];
 
+  const handleTabChange = useCallback(
+    selectedTabIndex => {
+      setSelected(selectedTabIndex);
+      setRange(tabs[selectedTabIndex].panelID);
+    },
+
+    [tabs]
+  );
+
   return (
     <Page title="Analytics">
       <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}></Tabs>
@@ -60,9 +65,12 @@ const Analytics = () => {
               <AnalyticBlock
                 currency
                 data={sales.current}
+                range={range}
                 change={
                   sales.past
-                    ? 0 && (sales.current - sales.past) / sales.past
+                    ? Math.round(
+                        ((sales.current - sales.past) / sales.past) * 100
+                      )
                     : null
                 }
                 title={`This ${tabs[selected].id}'s Sales`}
@@ -71,9 +79,12 @@ const Analytics = () => {
             <Section oneThird>
               <AnalyticBlock
                 data={orders.current}
+                range={range}
                 change={
                   orders.past
-                    ? 0 && (orders.current - orders.past) / orders.past
+                    ? Math.round(
+                        ((orders.current - orders.past) / orders.past) * 100
+                      )
                     : null
                 }
                 title={`This ${tabs[selected].id}'s Orders`}
@@ -82,9 +93,12 @@ const Analytics = () => {
             <Section oneThird>
               <AnalyticBlock
                 data={views.current}
+                range={range}
                 change={
                   views.past
-                    ? 0 && (views.current - views.past) / views.past
+                    ? Math.round(
+                        ((views.current - views.past) / views.past) * 100
+                      )
                     : null
                 }
                 title={`This ${tabs[selected].id}'s Views`}
@@ -93,9 +107,14 @@ const Analytics = () => {
             <Section oneThird>
               <AnalyticBlock
                 data={followers.current}
+                range={range}
                 change={
                   followers.past
-                    ? 0 && (followers.current - followers.past) / followers.past
+                    ? Math.round(
+                        ((followers.current - followers.past) /
+                          followers.past) *
+                          100
+                      )
                     : null
                 }
                 title={`This ${tabs[selected].id}'s Followers`}
@@ -107,27 +126,14 @@ const Analytics = () => {
           <Heading>Most Popular Products</Heading>
           <br />
           <Layout>
-            <Section oneThird>
-              <ProductCard
-                title="Bananas"
-                sales={32}
-                image="https://firebasestorage.googleapis.com/v0/b/local-guru-aeac9.appspot.com/o/products%2Fscott-webb-Ar0QYv-qtw4-unsplash.jpg?alt=media&token=caa4d65e-9673-40fe-970f-f6a16dccd187"
-              />
-            </Section>
-            <Section oneThird>
-              <ProductCard
-                title="Apple Juice"
-                sales={23}
-                image="https://firebasestorage.googleapis.com/v0/b/local-guru-aeac9.appspot.com/o/producers%2Falexander-mils-U6dWj2nhPEA-unsplash.jpg?alt=media&token=4210e19b-664c-4c31-8acd-5779aa361a93"
-              />
-            </Section>
-            <Section oneThird>
-              <ProductCard
-                title="Guava"
-                sales={12}
-                image="https://firebasestorage.googleapis.com/v0/b/local-guru-aeac9.appspot.com/o/products%2FGuava_ID.jpg?alt=media&token=13d4a37e-ca4a-424a-9d58-9df3cc954c9f"
-              />
-            </Section>
+            {products.slice(0, 3).map(product => {
+              const { title, image, sales } = product;
+              return (
+                <Section oneThird>
+                  <ProductCard title={title} sales={sales} image={image} />
+                </Section>
+              );
+            })}
           </Layout>
         </>
       )}

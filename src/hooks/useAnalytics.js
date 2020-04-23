@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
-import moment from "moment";
 
 const useAnalytics = (user, range) => {
   const [loaded, setLoaded] = useState(false);
@@ -9,84 +8,102 @@ const useAnalytics = (user, range) => {
   const [sales, setSales] = useState({ current: 0, past: 0 });
   const [orders, setOrders] = useState([{ current: 0, past: 0 }]);
   const [followers, setFollowers] = useState({ current: 0, past: 0 });
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      let limit = 14;
       setSales({ current: 0, past: 0 });
       setViews({ current: 0, past: 0 });
       setFollowers({ current: 0, past: 0 });
+      setOrders({ current: 0, past: 0 });
+      setProducts([]);
+
       try {
-        let startDate = new moment().startOf("isoweek").valueOf();
-        let endDate = Date.now();
         switch (range) {
           // Monthly range
           case 1:
             // TODO: Change this in case of 31 day months
-            startDate = moment()
-              .startOf("month")
-              .valueOf();
+            limit = 61;
             break;
           case 2:
-            startDate = moment()
-              .startOf("year")
-              .valueOf();
+            limit = 365;
             break;
           default:
-            endDate = Date.now();
+            limit = 14;
         }
 
-        // Fetch transactions with this producer
         const data = await db
-          .collection("transactions")
-          .where(`producers.${user}`, "==", true)
-          .orderBy("created_at")
-          .startAt(startDate)
-          .endAt(endDate)
-          .get();
-
-        // Map through each document to calculate sales
-        data.docs.map(transaction => {
-          const { items } = transaction.data();
-          return items.map(item => {
-            const { price, count } = item;
-            return setSales(prevState => ({
-              current: prevState.current + price * count,
-              past: 0
-            }));
-          });
-        });
-
-        const views = await db
           .collection("producers")
           .doc(user)
-          .collection("views")
-          .limit(range === "month" ? 30 : range === "year" ? 365 : 7)
+          .collection("analytics")
+          .orderBy("date", "desc")
+          .limit(limit)
           .get();
 
-        views.docs.map(doc => {
-          const { count } = doc.data();
-          console.log(count);
-          return setViews(prevState => ({
-            current: prevState.current + count,
-            past: 0
-          }));
+        data.docs.forEach(async (doc, index) => {
+          const { sales, orders, views, followers } = doc.data();
+          const currentDays = limit / 2 - 1;
+          const docProducts = doc.data().products;
+
+          if (index < currentDays) {
+            setSales(prevState => {
+              return { ...prevState, current: prevState.current + sales };
+            });
+            setFollowers(prevState => {
+              return { ...prevState, current: prevState.current + followers };
+            });
+            setOrders(prevState => {
+              return { ...prevState, current: prevState.current + orders };
+            });
+            setViews(prevState => {
+              return { ...prevState, current: prevState.current + views };
+            });
+
+            if (docProducts) {
+              let newArray = [];
+
+              Object.keys(docProducts).map(async item => {
+                const product = await db
+                  .collection("products")
+                  .doc(item)
+                  .get();
+                const { title, image } = product.data();
+
+                newArray = [
+                  ...newArray,
+                  {
+                    title: title,
+                    image: image,
+                    sales: docProducts[item]
+                  }
+                ];
+
+                newArray.sort((a, b) => {
+                  return b.sales - a.sales;
+                });
+
+                return setProducts(newArray);
+              });
+            }
+          } else {
+            setSales(prevState => {
+              return { ...prevState, past: prevState.past + sales };
+            });
+            setFollowers(prevState => {
+              return { ...prevState, past: prevState.past + followers };
+            });
+            setOrders(prevState => {
+              return { ...prevState, past: prevState.past + orders };
+            });
+            setViews(prevState => {
+              return { ...prevState, past: prevState.past + views };
+            });
+          }
         });
-
-        // Fetch followers
-        const followers = await db
-          .collection("users")
-          .where("following.producer", "==", user)
-          .orderBy("following.date")
-          .startAt(startDate)
-          .endAt(endDate)
-          .get();
-
-        setFollowers({ current: followers.docs.length, past: 0 });
-        setOrders({ current: data.docs.length, past: 0 });
         setLoaded(true);
       } catch (err) {
         console.log(err);
-        setError();
       }
     };
 
@@ -99,6 +116,7 @@ const useAnalytics = (user, range) => {
     views,
     sales,
     orders,
+    products,
     followers
   };
 };
