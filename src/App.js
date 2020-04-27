@@ -20,6 +20,7 @@ import Followers from "./pages/Followers";
 import OrdersAdmin from "./pages/Orders/OrdersAdmin";
 import EditSingleProduct from "./pages/Products/Edit";
 import AddSingleProduct from "./pages/Products/AddSingleProduct";
+import EditPageHome from "./pages/pages/Home";
 import { toggleToast } from "./actions/UIActions";
 import Settings from "./pages/Settings";
 import Terms from "./pages/Terms";
@@ -89,6 +90,7 @@ class App extends Component {
                   <Route path="/terms" component={Terms} />
                   <Route path="/privacy-policy" component={PrivacyPolicy} />
                   <Route path="/help" component={Help} />
+                  <Route path="/pages/edit/home" component={EditPageHome} />
                 </Switch>
               </Section>
             </Layout>

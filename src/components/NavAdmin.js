@@ -50,6 +50,7 @@ class Nav extends Component {
           items={[
             {
               label: "Home Page",
+              url: "/pages/edit/home",
               icon: "notes"
             },
             {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Page, Layout, Card } from "@shopify/polaris";
 import AddProduct from "../../components/AddProduct";
+import AddProductAdmin from "../../components/AddProductAdmin";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { db } from "../../firebase";
@@ -168,7 +169,7 @@ const AddSingleProduct = () => {
     return value;
   }, []);
 
-  const { title, description } = values;
+  const { title, description, category } = values;
 
   return (
     <Page
@@ -182,7 +183,26 @@ const AddSingleProduct = () => {
     >
       <Layout>
         <Layout.Section>
-          {loaded && (
+          {loaded && user.admin ? (
+            <AddProductAdmin
+              products={products}
+              title={title}
+              selected={selected}
+              description={description}
+              units={units}
+              category={values.category}
+              seasons={seasons}
+              handleSeason={handleSeason}
+              handleProductChoice={handleProductChoice}
+              handleChangeTextField={handleChangeTextField}
+              handleSelectChange={handleChangeTextField}
+              handleFocus={handleFocus}
+              handleCurrencyBlur={handleCurrencyBlur}
+              handleChangeUnit={handleChangeUnit}
+              handleAddUnit={handleAddUnit}
+              handleRemoveUnit={handleRemoveUnit}
+            />
+          ) : (
             <AddProduct
               products={products}
               title={title}

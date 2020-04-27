@@ -12,7 +12,8 @@ import PropTypes from "prop-types";
 
 class AddProduct extends Component {
   state = {
-    tag: ""
+    tag: "",
+    tags: []
   };
 
   handleTag = value => {
@@ -38,10 +39,9 @@ class AddProduct extends Component {
 
   render() {
     const {
+      category,
       title,
       handleChangeTextField,
-      handleCategoryChange,
-      category,
       tags,
       handleRemoveTag
     } = this.props;
@@ -67,8 +67,8 @@ class AddProduct extends Component {
               <Select
                 label="Category"
                 options={categories}
-                onChange={handleCategoryChange}
                 value={category}
+                onChange={value => handleChangeTextField(value, "category")}
               />
             </FormLayout>
           </Card.Section>
@@ -81,11 +81,12 @@ class AddProduct extends Component {
                 onChange={value => this.handleTag(value)}
               />
               <Stack>
-                {tags.map((tag, index) => (
-                  <Tag key={index} onRemove={() => handleRemoveTag(index)}>
-                    {tag}
-                  </Tag>
-                ))}
+                {tags &&
+                  tags.map((tag, index) => (
+                    <Tag key={index} onRemove={() => handleRemoveTag(index)}>
+                      {tag}
+                    </Tag>
+                  ))}
               </Stack>
             </FormLayout>
           </Card.Section>
