@@ -90,6 +90,15 @@ class AddProduct extends Component {
               </Stack>
             </FormLayout>
           </Card.Section>
+          <Card.Section title="Pricing">
+            <TextField
+              type="number"
+              onChange={handleChangeTextField}
+              placeholder="Maximum price"
+              prefix="$"
+              min={0}
+            />
+          </Card.Section>
         </Form>
       </Card>
     );

@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { db } from "../../firebase";
 import { useSelector } from "react-redux";
+import ProductPhotoUpload from "../../components/ProductPhotoUpload";
 
 const Image = styled.div`
   img {
@@ -169,6 +170,17 @@ const AddSingleProduct = () => {
     return value;
   }, []);
 
+  const handleAddTag = useCallback(
+    newTag => {
+      setValues(prevValues => ({
+        ...prevValues,
+        tags: [...values.tags, newTag]
+      }));
+      setTouched(true);
+    },
+    [values.tags]
+  );
+
   const { title, description, category } = values;
 
   return (
@@ -192,6 +204,7 @@ const AddSingleProduct = () => {
               units={units}
               category={values.category}
               seasons={seasons}
+              tags={values.tags}
               handleSeason={handleSeason}
               handleProductChoice={handleProductChoice}
               handleChangeTextField={handleChangeTextField}
@@ -201,6 +214,7 @@ const AddSingleProduct = () => {
               handleChangeUnit={handleChangeUnit}
               handleAddUnit={handleAddUnit}
               handleRemoveUnit={handleRemoveUnit}
+              handleAddTag={handleAddTag}
             />
           ) : (
             <AddProduct
@@ -224,16 +238,20 @@ const AddSingleProduct = () => {
         </Layout.Section>
         <Layout.Section secondary>
           <Card sectioned>
-            <Image>
-              <>
-                {selected.index && (
-                  <img
-                    src={products[selected.index].image}
-                    alt={products[selected.index].title}
-                  />
-                )}
-              </>
-            </Image>
+            {user.admin ? (
+              <ProductPhotoUpload />
+            ) : (
+              <Image>
+                <>
+                  {selected.index && (
+                    <img
+                      src={products[selected.index].image}
+                      alt={products[selected.index].title}
+                    />
+                  )}
+                </>
+              </Image>
+            )}
           </Card>
         </Layout.Section>
       </Layout>
