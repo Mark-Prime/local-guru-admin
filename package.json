@@ -2,9 +2,6 @@
   "name": "local-guru-admin",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": "12"
-  },
   "dependencies": {
     "@firebase/app": "^0.6.0",
     "@firebase/firestore": "^1.1.3",

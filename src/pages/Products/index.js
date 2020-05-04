@@ -57,8 +57,32 @@ const Products = () => {
       }
     };
 
+    const fetchAdmin = async () => {
+      let array = [];
+
+      const snapshot = await db
+        .collection("products")
+        .orderBy("title")
+        .get();
+
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          array.push(doc.data());
+        });
+
+        setProducts(array);
+        setLoaded(true);
+      } else {
+        setLoaded(true);
+      }
+    };
+
     if (!loaded) {
-      fetchUserProducts();
+      if (user.admin) {
+        fetchAdmin();
+      } else {
+        fetchUserProducts();
+      }
     }
   }, [user, loaded]);
 

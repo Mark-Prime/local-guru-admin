@@ -6,6 +6,7 @@ import {
   TextField,
   Select,
   Stack,
+  ChoiceList,
   Tag
 } from "@shopify/polaris";
 import PropTypes from "prop-types";
@@ -43,7 +44,10 @@ class AddProduct extends Component {
       title,
       handleChangeTextField,
       tags,
-      handleRemoveTag
+      maxPrice,
+      handleRemoveTag,
+      handleSeason,
+      seasons
     } = this.props;
 
     const categories = [
@@ -93,10 +97,26 @@ class AddProduct extends Component {
           <Card.Section title="Pricing">
             <TextField
               type="number"
+              id="maxPrice"
+              value={maxPrice}
               onChange={handleChangeTextField}
               placeholder="Maximum price"
               prefix="$"
               min={0}
+            />
+          </Card.Section>
+          <Card.Section>
+            <ChoiceList
+              allowMultiple
+              title="Season(s) product is allowed"
+              choices={[
+                { label: "Spring", value: "spring" },
+                { label: "Summer", value: "summer" },
+                { label: "Fall", value: "fall" },
+                { label: "Winter", value: "winter" }
+              ]}
+              selected={seasons}
+              onChange={handleSeason}
             />
           </Card.Section>
         </Form>

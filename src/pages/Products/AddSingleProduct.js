@@ -20,6 +20,7 @@ const AddSingleProduct = () => {
     title: "",
     category: "veggies",
     photo: "",
+    maxPrice: 0,
     tags: []
   };
   const [touched, setTouched] = useState(false);
@@ -164,6 +165,15 @@ const AddSingleProduct = () => {
     history.goBack();
   };
 
+  const handlePhoto = useCallback(file => {
+    console.log(file);
+    setValues(prevValues => ({
+      ...prevValues,
+      image: file
+    }));
+    setTouched(true);
+  }, []);
+
   const handleSeason = useCallback(value => setSeasons(value), []);
 
   const handleCurrencyBlur = useCallback(value => {
@@ -181,7 +191,22 @@ const AddSingleProduct = () => {
     [values.tags]
   );
 
-  const { title, description, category } = values;
+  const handleRemoveTag = useCallback(
+    tagIndex => {
+      let updatedTags = [...values.tags];
+
+      updatedTags.splice(tagIndex, 1);
+
+      setValues(prevValues => ({
+        ...prevValues,
+        tags: updatedTags
+      }));
+      setTouched(true);
+    },
+    [values.tags]
+  );
+
+  const { title, description, category, maxPrice, tags } = values;
 
   return (
     <Page
@@ -202,9 +227,10 @@ const AddSingleProduct = () => {
               selected={selected}
               description={description}
               units={units}
-              category={values.category}
+              category={category}
               seasons={seasons}
-              tags={values.tags}
+              tags={tags}
+              maxPrice={maxPrice}
               handleSeason={handleSeason}
               handleProductChoice={handleProductChoice}
               handleChangeTextField={handleChangeTextField}
@@ -215,6 +241,7 @@ const AddSingleProduct = () => {
               handleAddUnit={handleAddUnit}
               handleRemoveUnit={handleRemoveUnit}
               handleAddTag={handleAddTag}
+              handleRemoveTag={handleRemoveTag}
             />
           ) : (
             <AddProduct
@@ -239,7 +266,7 @@ const AddSingleProduct = () => {
         <Layout.Section secondary>
           <Card sectioned>
             {user.admin ? (
-              <ProductPhotoUpload />
+              <ProductPhotoUpload onChange={handlePhoto} />
             ) : (
               <Image>
                 <>
