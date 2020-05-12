@@ -140,23 +140,26 @@ const Products = () => {
   //   setModal(modal => !modal);
   // }, []);
 
-  const renderItem = useCallback(item => {
-    const { product, title, image } = item;
-    const media = <Thumbnail alt={title} source={image} />;
+  const renderItem = useCallback(
+    item => {
+      const { product, title, image, id } = item;
+      const media = <Thumbnail alt={title} source={image} />;
 
-    return (
-      <ResourceList.Item
-        id={product}
-        media={media}
-        url={`/product/edit/${product}`}
-        accessibilityLabel={`View details for ${title}`}
-      >
-        <h3>
-          <TextStyle variation="strong">{title}</TextStyle>
-        </h3>
-      </ResourceList.Item>
-    );
-  }, []);
+      return (
+        <ResourceList.Item
+          id={user.admin ? id : product}
+          media={media}
+          url={`/product/edit/${user.admin ? id : product}`}
+          accessibilityLabel={`View details for ${title}`}
+        >
+          <h3>
+            <TextStyle variation="strong">{title}</TextStyle>
+          </h3>
+        </ResourceList.Item>
+      );
+    },
+    [user.admin]
+  );
 
   const resourceName = {
     singular: "product",

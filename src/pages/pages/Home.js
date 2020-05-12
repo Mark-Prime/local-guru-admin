@@ -157,6 +157,54 @@ const EditPageHome = () => {
     }
   };
 
+  const handleBlockTypeChange = useCallback(
+    (value, id) => {
+      const fieldInfo = id.split("-");
+
+      const index = fieldInfo[1];
+      const side = fieldInfo[2];
+
+      const newArray = [...blocks];
+
+      switch (value) {
+        case "list":
+          newArray[index] = {
+            ...newArray[index],
+            [side]: {
+              heading: "",
+              items: []
+            }
+          };
+          break;
+        case "imageText":
+          newArray[index] = {
+            ...newArray[index],
+            [side]: {
+              heading: "",
+              body: "",
+              image: null,
+              type: "imageText"
+            }
+          };
+          break;
+        default:
+          // Text Field
+          newArray[index] = {
+            ...newArray[index],
+            [side]: {
+              heading: "",
+              body: "",
+              type: "text"
+            }
+          };
+      }
+
+      setBlocks(newArray);
+      setTouched(true);
+    },
+    [blocks]
+  );
+
   const handleChangeBlockList = useCallback(
     (value, id) => {
       const fieldInfo = id.split("-");
@@ -237,7 +285,12 @@ const EditPageHome = () => {
                     {left.type === "list" ? (
                       <FormLayout>
                         <Select
+                          handleBlockTypeChange
                           options={blockOptions}
+                          id={`block-${index}-left`}
+                          onChange={(value, id) =>
+                            handleBlockTypeChange(value, id)
+                          }
                           value={block.left.type}
                         />
                         <TextField
@@ -255,6 +308,8 @@ const EditPageHome = () => {
                         <Select
                           options={blockOptions}
                           value={block.left.type}
+                          id={`block-${index}-left`}
+                          onChange={handleBlockTypeChange}
                         />
                         <Thumbnail source={block.left.image} size="large" />
                         <TextField
@@ -276,6 +331,8 @@ const EditPageHome = () => {
                         <Select
                           options={blockOptions}
                           value={block.left.type}
+                          id={`block-${index}-left`}
+                          onChange={handleBlockTypeChange}
                         />
                         <TextField
                           label="Heading"
@@ -301,6 +358,10 @@ const EditPageHome = () => {
                         <Select
                           options={blockOptions}
                           value={block.right.type}
+                          id={`block-${index}-right`}
+                          onChange={(value, id) =>
+                            handleBlockTypeChange(value, id)
+                          }
                         />
                         <TextField
                           label="Heading"
@@ -331,6 +392,10 @@ const EditPageHome = () => {
                         <Select
                           options={blockOptions}
                           value={block.right.type}
+                          id={`block-${index}-right`}
+                          onChange={(value, id) =>
+                            handleBlockTypeChange(value, id)
+                          }
                         />
                         <Thumbnail source={block.right.image} size="large" />
                         <TextField
@@ -352,6 +417,10 @@ const EditPageHome = () => {
                         <Select
                           options={blockOptions}
                           value={block.right.type}
+                          id={`block-${index}-right`}
+                          onChange={(value, id) =>
+                            handleBlockTypeChange(value, id)
+                          }
                         />
                         <TextField
                           label="Heading"

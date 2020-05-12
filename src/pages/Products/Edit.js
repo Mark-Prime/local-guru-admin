@@ -9,6 +9,7 @@ import {
   Button
 } from "@shopify/polaris";
 import AddProduct from "../../components/AddProduct";
+import EditProductAdmin from "../../components/AddProductAdmin";
 import styled from "styled-components";
 import { useHistory, useParams } from "react-router-dom";
 import { db } from "../../firebase";
@@ -20,7 +21,7 @@ const Image = styled.div`
   }
 `;
 
-const AddSingleProduct = () => {
+const EditSingleProduct = () => {
   const defaultValues = {
     description: "",
     title: "",
@@ -107,7 +108,7 @@ const AddSingleProduct = () => {
     if (selected.title === "") {
       fetchSingleProduct();
     }
-  }, [productId, products, selected.title, user.uid]);
+  }, [productId, products, selected.title, user.admin, user.uid]);
 
   const handleFocus = e => {
     e.target.select();
@@ -230,12 +231,38 @@ const AddSingleProduct = () => {
     setTouched(true);
   }, []);
 
-  const { title, description } = values;
+  const handleAddTag = useCallback(
+    newTag => {
+      setValues(prevValues => ({
+        ...prevValues,
+        tags: [...values.tags, newTag]
+      }));
+      setTouched(true);
+    },
+    [values.tags]
+  );
+
+  const handleRemoveTag = useCallback(
+    tagIndex => {
+      let updatedTags = [...values.tags];
+
+      updatedTags.splice(tagIndex, 1);
+
+      setValues(prevValues => ({
+        ...prevValues,
+        tags: updatedTags
+      }));
+      setTouched(true);
+    },
+    [values.tags]
+  );
+
+  const { title, description, category, maxPrice, tags } = values;
 
   return (
     <Page
       breadcrumbs={[{ content: "Products", onAction: goBack }]}
-      title="Add Product"
+      title="Edit Product"
       primaryAction={{
         content: "Save",
         disabled: !touched,
@@ -243,33 +270,58 @@ const AddSingleProduct = () => {
       }}
     >
       <Layout>
-        <Layout.Section>
-          {loaded && (
-            <AddProduct
-              products={products}
-              title={title}
-              selected={selected}
-              description={description}
-              units={units}
-              seasons={seasons}
-              handleSeason={handleSeason}
-              handleProductChoice={handleProductChoice}
-              handleChangeTextField={handleChangeTextField}
-              handleSelectChange={handleChangeTextField}
-              handleFocus={handleFocus}
-              handleCurrencyBlur={handleCurrencyBlur}
-              handleChangeUnit={handleChangeUnit}
-              handleAddUnit={handleAddUnit}
-              handleRemoveUnit={handleRemoveUnit}
-            />
-          )}
-          <br />
-          <ButtonGroup>
-            <Button destructive onClick={() => setModal(true)}>
-              Delete Product
-            </Button>
-          </ButtonGroup>
-        </Layout.Section>
+        {loaded && (
+          <Layout.Section>
+            {user.admin ? (
+              <EditProductAdmin
+                product={products.find(x => x.id === productId)}
+                title={title}
+                selected={selected}
+                description={description}
+                units={units}
+                category={category}
+                seasons={seasons}
+                tags={tags}
+                maxPrice={maxPrice}
+                handleSeason={handleSeason}
+                handleProductChoice={handleProductChoice}
+                handleChangeTextField={handleChangeTextField}
+                handleSelectChange={handleChangeTextField}
+                handleFocus={handleFocus}
+                handleCurrencyBlur={handleCurrencyBlur}
+                handleChangeUnit={handleChangeUnit}
+                handleAddUnit={handleAddUnit}
+                handleRemoveUnit={handleRemoveUnit}
+                handleAddTag={handleAddTag}
+                handleRemoveTag={handleRemoveTag}
+              />
+            ) : (
+              <AddProduct
+                products={products}
+                title={title}
+                selected={selected}
+                description={description}
+                units={units}
+                seasons={seasons}
+                handleSeason={handleSeason}
+                handleProductChoice={handleProductChoice}
+                handleChangeTextField={handleChangeTextField}
+                handleSelectChange={handleChangeTextField}
+                handleFocus={handleFocus}
+                handleCurrencyBlur={handleCurrencyBlur}
+                handleChangeUnit={handleChangeUnit}
+                handleAddUnit={handleAddUnit}
+                handleRemoveUnit={handleRemoveUnit}
+              />
+            )}
+            <br />
+            <ButtonGroup>
+              <Button destructive onClick={() => setModal(true)}>
+                Delete Product
+              </Button>
+            </ButtonGroup>
+          </Layout.Section>
+        )}
         <Layout.Section secondary>
           <Card sectioned>
             <Image>
@@ -310,4 +362,4 @@ const AddSingleProduct = () => {
   );
 };
 
-export default AddSingleProduct;
+export default EditSingleProduct;

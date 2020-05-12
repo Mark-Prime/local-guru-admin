@@ -6,13 +6,15 @@ import {
   TextField,
   Select,
   Stack,
+  ChoiceList,
   Tag
 } from "@shopify/polaris";
 import PropTypes from "prop-types";
 
-class EditProduct extends Component {
+class AddProduct extends Component {
   state = {
-    tag: ""
+    tag: "",
+    tags: []
   };
 
   handleTag = value => {
@@ -38,12 +40,14 @@ class EditProduct extends Component {
 
   render() {
     const {
+      category,
       title,
       handleChangeTextField,
-      handleCategoryChange,
-      category,
       tags,
-      handleRemoveTag
+      maxPrice,
+      handleRemoveTag,
+      handleSeason,
+      seasons
     } = this.props;
 
     const categories = [
@@ -67,8 +71,8 @@ class EditProduct extends Component {
               <Select
                 label="Category"
                 options={categories}
-                onChange={handleCategoryChange}
                 value={category}
+                onChange={value => handleChangeTextField(value, "category")}
               />
             </FormLayout>
           </Card.Section>
@@ -81,13 +85,39 @@ class EditProduct extends Component {
                 onChange={value => this.handleTag(value)}
               />
               <Stack>
-                {tags.map((tag, index) => (
-                  <Tag key={index} onRemove={() => handleRemoveTag(index)}>
-                    {tag}
-                  </Tag>
-                ))}
+                {tags &&
+                  tags.map((tag, index) => (
+                    <Tag key={index} onRemove={() => handleRemoveTag(index)}>
+                      {tag}
+                    </Tag>
+                  ))}
               </Stack>
             </FormLayout>
+          </Card.Section>
+          <Card.Section title="Pricing">
+            <TextField
+              type="number"
+              id="maxPrice"
+              value={maxPrice}
+              onChange={handleChangeTextField}
+              placeholder="Maximum price"
+              prefix="$"
+              min={0}
+            />
+          </Card.Section>
+          <Card.Section>
+            <ChoiceList
+              allowMultiple
+              title="Season(s) product is allowed"
+              choices={[
+                { label: "Spring", value: "spring" },
+                { label: "Summer", value: "summer" },
+                { label: "Fall", value: "fall" },
+                { label: "Winter", value: "winter" }
+              ]}
+              selected={seasons}
+              onChange={handleSeason}
+            />
           </Card.Section>
         </Form>
       </Card>
@@ -95,10 +125,16 @@ class EditProduct extends Component {
   }
 }
 
-EditProduct.propTypes = {
+AddProduct.propTypes = {
   title: PropTypes.string,
   edit: PropTypes.bool,
-  handleChangeTextField: PropTypes.func.isRequired
+  unit: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  selected: PropTypes.string.isRequired,
+  handleProductChoice: PropTypes.func.isRequired,
+  handleFocus: PropTypes.func.isRequired,
+  handleChangeTextField: PropTypes.func.isRequired,
+  handleCurrencyBlur: PropTypes.func.isRequired
 };
 
-export default EditProduct;
+export default AddProduct;
