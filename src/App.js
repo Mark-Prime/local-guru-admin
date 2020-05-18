@@ -21,6 +21,8 @@ import OrdersAdmin from "./pages/Orders/OrdersAdmin";
 import EditSingleProduct from "./pages/Products/Edit";
 import AddSingleProduct from "./pages/Products/AddSingleProduct";
 import EditPageHome from "./pages/pages/Home";
+import Categories from "./pages/Categories";
+import EditCategory from "./pages/Categories/Edit";
 import { toggleToast } from "./actions/UIActions";
 import Settings from "./pages/Settings";
 import Terms from "./pages/Terms";
@@ -88,6 +90,15 @@ class App extends Component {
                   <Route path="/create-account" component={Register} />
                   <Route path="/open-house" component={OpenHouse} />
                   <Route path="/terms" component={Terms} />
+                  <Route
+                    exact
+                    path="/products/categories"
+                    component={Categories}
+                  />
+                  <Route
+                    path="/products/categories/:id"
+                    component={EditCategory}
+                  />
                   <Route path="/privacy-policy" component={PrivacyPolicy} />
                   <Route path="/help" component={Help} />
                   <Route path="/pages/edit/home" component={EditPageHome} />

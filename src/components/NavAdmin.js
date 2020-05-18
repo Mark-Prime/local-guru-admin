@@ -34,6 +34,10 @@ class Nav extends Component {
                 {
                   url: "/products/add",
                   label: "Add New Product"
+                },
+                {
+                  url: "/products/categories",
+                  label: "Categories"
                 }
               ]
             },

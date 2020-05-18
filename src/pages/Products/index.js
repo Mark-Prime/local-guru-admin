@@ -7,7 +7,7 @@ import {
   ResourceList,
   TextStyle,
   Thumbnail,
-  Pagination,
+  Button,
   EmptyState,
   Link,
   Modal,
@@ -16,15 +16,17 @@ import {
 import { db } from "../../firebase";
 import emptyProducts from "../../assets/empty-products.svg";
 import styled from "styled-components";
+import { connectInfiniteHits } from "react-instantsearch-dom";
 
 const PaginationFooter = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100px;
+  padding: 2rem;
 `;
 
-const Products = () => {
+const Products = ({ hits, hasMore, refineNext }) => {
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
   const [products, setProducts] = useState([]);
@@ -108,38 +110,6 @@ const Products = () => {
     setLoaded(false);
   }, [selectedItems, user.uid]);
 
-  const onPrev = useCallback(() => {
-    const { page } = this.state;
-    const limit = 50;
-    const firstProduct = products[0];
-    const offset = products[firstProduct].created_at;
-    console.log(`end before ${firstProduct}`);
-    this.props.fetchProducts({ endBefore: offset, limit: limit }).then(() => {
-      this.setState({ page: page - 1 });
-      if (page === 2) {
-        history.push(`/products`);
-      } else {
-        history.push(`/products/page/${this.state.page}`);
-      }
-    });
-  }, [history, products]);
-
-  const onNext = useCallback(() => {
-    const limit = 50;
-    const lastProduct = Object.keys(products)[49];
-    const offset = this.props.products[lastProduct].created_at;
-    console.log(`start after ${lastProduct}`);
-    this.props.fetchProducts({ startAfter: offset, limit: limit }).then(() => {
-      this.setState({ page: page + 1 });
-      setPage(page => page + 1);
-      history.push(`/products/page/${this.state.page}`);
-    });
-  }, [history, page, products]);
-
-  // const handleModalToggle = useCallback(type => {
-  //   setModal(modal => !modal);
-  // }, []);
-
   const renderItem = useCallback(
     item => {
       const { product, title, image, id } = item;
@@ -149,6 +119,9 @@ const Products = () => {
         <ResourceList.Item
           id={user.admin ? id : product}
           media={media}
+          loading={!loaded}
+          showHeader
+          totalItemsCount={50}
           url={`/product/edit/${user.admin ? id : product}`}
           accessibilityLabel={`View details for ${title}`}
         >
@@ -158,7 +131,7 @@ const Products = () => {
         </ResourceList.Item>
       );
     },
-    [user.admin]
+    [loaded, user.admin]
   );
 
   const resourceName = {
@@ -211,7 +184,7 @@ const Products = () => {
             </>
             <Card>
               <ResourceList
-                items={products}
+                items={hits}
                 resourceName={resourceName}
                 renderItem={renderItem}
                 selectedItems={selectedItems}
@@ -219,20 +192,9 @@ const Products = () => {
                 selectable
                 promotedBulkActions={promotedBulkActions}
               />
-              {products.length > 49 ? (
-                <PaginationFooter>
-                  <Pagination
-                    hasPrevious={page > 1}
-                    previousKeys={[74]}
-                    previousTooltip="j"
-                    onPrevious={onPrev}
-                    hasNext
-                    nextKeys={[75]}
-                    nextTooltip="k"
-                    onNext={onNext}
-                  />
-                </PaginationFooter>
-              ) : null}
+              <PaginationFooter>
+                <Button onClick={refineNext}>Load More</Button>
+              </PaginationFooter>
             </Card>
           </>
         ) : (
@@ -281,4 +243,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default connectInfiniteHits(Products);
