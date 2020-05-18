@@ -4,9 +4,11 @@ import AddProduct from "../../components/AddProduct";
 import AddProductAdmin from "../../components/AddProductAdmin";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { useSelector } from "react-redux";
 import ProductPhotoUpload from "../../components/ProductPhotoUpload";
+import { TOGGLE_TOAST } from "../../actions/UIActions";
+import { useDispatch } from "react-redux";
 
 const Image = styled.div`
   img {
@@ -20,6 +22,7 @@ const AddSingleProduct = () => {
     title: "",
     category: "veggies",
     photo: "",
+    image: {},
     maxPrice: 0,
     tags: []
   };
@@ -41,6 +44,8 @@ const AddSingleProduct = () => {
       max: ""
     }
   ]);
+
+  const dispatch = useDispatch();
 
   const history = useHistory();
   const user = useSelector(state => state.user);
@@ -85,6 +90,7 @@ const AddSingleProduct = () => {
       ...prevValues,
       [id]: value
     }));
+    setTouched(true);
   }, []);
 
   const handleAddUnit = useCallback(() => {
@@ -92,6 +98,7 @@ const AddSingleProduct = () => {
     let updatedUnits = [...units, { value: "lb", price: 0 }];
     // set state with new array
     setUnits(updatedUnits);
+    setTouched(true);
   }, [units]);
 
   const handleRemoveUnit = useCallback(
@@ -102,6 +109,7 @@ const AddSingleProduct = () => {
       updatedUnits.splice(index, 1);
       // set state with new array
       setUnits(updatedUnits);
+      setTouched(true);
     },
     [units]
   );
@@ -114,6 +122,7 @@ const AddSingleProduct = () => {
       updatedUnits[index] = { price: price, value: value, max: max };
       // set state with new array
       setUnits(updatedUnits);
+      setTouched(true);
     },
     [units]
   );
@@ -161,16 +170,59 @@ const AddSingleProduct = () => {
     units
   ]);
 
+  const handleSubmitAdmin = useCallback(async () => {
+    let id = "";
+    try {
+      const res = await db.collection("products").add({
+        ...values,
+        seasons: seasons
+      });
+      id = res.id;
+      db.collection("products")
+        .doc(id)
+        .set(
+          {
+            id: id
+          },
+          { merge: true }
+        );
+    } catch (e) {
+      console.log(e);
+    } finally {
+      dispatch({ type: TOGGLE_TOAST, payload: "Product created" });
+      history.push(`/product/edit/${id}`);
+    }
+  }, [dispatch, history, seasons, values]);
+
   const goBack = () => {
     history.goBack();
   };
 
-  const handlePhoto = useCallback(file => {
-    console.log(file);
-    setValues(prevValues => ({
-      ...prevValues,
-      image: file
-    }));
+  const handlePhoto = useCallback(async file => {
+    let url = "";
+    try {
+      const res = await storage
+        .ref()
+        .child(`products/${file.name}`)
+        .put(file);
+
+      if (res.state === "success") {
+        url = await storage
+          .ref()
+          .child(`products/${file.name}`)
+          .getDownloadURL();
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      console.log(url);
+      setValues(prevValues => ({
+        ...prevValues,
+        image: url
+      }));
+      setTouched(true);
+    }
+
     setTouched(true);
   }, []);
 
@@ -215,7 +267,7 @@ const AddSingleProduct = () => {
       primaryAction={{
         content: "Save",
         disabled: !touched,
-        onAction: handleSubmit
+        onAction: user.admin ? handleSubmitAdmin : handleSubmit
       }}
     >
       <Layout>
@@ -266,7 +318,10 @@ const AddSingleProduct = () => {
         <Layout.Section secondary>
           <Card sectioned>
             {user.admin ? (
-              <ProductPhotoUpload onChange={handlePhoto} />
+              <ProductPhotoUpload
+                className="photo-upload"
+                onChange={handlePhoto}
+              />
             ) : (
               <Image>
                 <>

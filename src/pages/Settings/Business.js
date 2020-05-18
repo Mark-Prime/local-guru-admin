@@ -1,17 +1,14 @@
 import React, { useState, useCallback } from "react";
 import { Card, TextField, FormLayout, Badge } from "@shopify/polaris";
 import { db } from "../../firebase";
-import styled from 'styled-components';
-import Autocomplete from 'react-google-autocomplete'
+import styled from "styled-components";
+import Autocomplete from "react-google-autocomplete";
 
 const { Group } = FormLayout;
 
-const Wrapper = styled.div`
-
-`;
+const Wrapper = styled.div``;
 
 const StyledField = styled.div`
-
   span {
     margin-bottom: 0.5rem;
     display: block;
@@ -29,9 +26,9 @@ const StyledField = styled.div`
       bottom: 0;
       left: 0;
       background-color: #fff;
-      border: .1rem solid var(--p-border,#c4cdd5);
+      border: 0.1rem solid var(--p-border, #c4cdd5);
       border-radius: 3px;
-      box-shadow: inset 0 1px 0 0 rgba(99,115,129,.05);
+      box-shadow: inset 0 1px 0 0 rgba(99, 115, 129, 0.05);
       pointer-events: none;
     }
 
@@ -49,11 +46,11 @@ const StyledField = styled.div`
       min-width: 0;
       min-height: 3.6rem;
       margin: 0;
-      padding: .5rem 1.2rem;
+      padding: 0.5rem 1.2rem;
       background: none;
-      border: .1rem solid transparent;
+      border: 0.1rem solid transparent;
+    }
   }
-}
 `;
 
 const Business = ({ user }) => {
@@ -68,8 +65,8 @@ const Business = ({ user }) => {
   };
 
   const [values, setValues] = useState(user.businessDetails || defaultValues);
-  const [error, setError] = useState(false)
-  const [valid, setValid] = useState(false)
+  const [error, setError] = useState(false);
+  const [valid, setValid] = useState(false);
   const [touched, setTouched] = useState(false);
 
   const handleTextField = useCallback((value, id) => {
@@ -89,110 +86,114 @@ const Business = ({ user }) => {
     setTouched(false);
   }, [user.uid, values]);
 
-  const deliveryCounties = ['Ramsey County', 'Hennepin County']
+  const deliveryCounties = ["Ramsey County", "Hennepin County"];
 
   const { businessName, fullName, street, zip, apt, city, phone } = values;
 
   return (
     <Wrapper>
-    <Card
-      sectioned
-      primaryFooterAction={{
-        content: "Update Business details",
-        onAction: () => handleSubmit(),
-        disabled: !touched
-      }}
-    >
-      <FormLayout>
-        <Group>
-          <TextField
-            label="Legal business name"
-            id="businessName"
-            value={businessName}
-            onChange={handleTextField}
-          />
-          <TextField
-            label="Your full name"
-            id="fullName"
-            value={fullName}
-            onChange={handleTextField}
-          />
-          <TextField
-            label="Phone number"
-            id="phone"
-            value={phone}
-            maxLength={10}
-            type="tel"
-            onChange={handleTextField}
-          />
-        </Group>
-        <StyledField>
-        <span>Address</span>
-        <div>
-        <Autocomplete
-          className='autocomplete'
-          placeholder='Enter your address'
-          onPlaceSelected={place => {
-            const { address_components } = place;
-            const county = address_components[4].long_name;
-            if(deliveryCounties.indexOf(county) > -1 ){
-              setValues(prevValues => ({
-                ...prevValues,
-                street: `${address_components[0].short_name} ${address_components[1].short_name}`,
-                city: address_components[3].short_name,
-                zip: address_components[7].short_name
-              }));
-              setValid(true)
-            } else {
-              setError(true)
-              setValues(prevValues => ({
-                ...prevValues,
-                street: "",
-                city: "",
-                apartment: "",
-                zip: ""
-              }));
-            }
-          }}
-          types={['address']}
-          componentRestrictions={{country: "us"}}
-      />
-      </div>
-      </StyledField>
-      {error && <Badge status="warning">Your address must be in the Twin Cities area.</Badge>}
+      <Card
+        sectioned
+        primaryFooterAction={{
+          content: "Update Business details",
+          onAction: () => valid && handleSubmit(),
+          disabled: !touched
+        }}
+      >
+        <FormLayout>
+          <Group>
+            <TextField
+              label="Legal business name"
+              id="businessName"
+              value={businessName}
+              onChange={handleTextField}
+            />
+            <TextField
+              label="Your full name"
+              id="fullName"
+              value={fullName}
+              onChange={handleTextField}
+            />
+            <TextField
+              label="Phone number"
+              id="phone"
+              value={phone}
+              maxLength={10}
+              type="tel"
+              onChange={handleTextField}
+            />
+          </Group>
+          <StyledField>
+            <span>Address</span>
+            <div>
+              <Autocomplete
+                className="autocomplete"
+                placeholder="Enter your address"
+                onPlaceSelected={place => {
+                  const { address_components } = place;
+                  const county = address_components[4].long_name;
+                  if (deliveryCounties.indexOf(county) > -1) {
+                    setValues(prevValues => ({
+                      ...prevValues,
+                      street: `${address_components[0].short_name} ${address_components[1].short_name}`,
+                      city: address_components[3].short_name,
+                      zip: address_components[7].short_name
+                    }));
+                    setValid(true);
+                  } else {
+                    setError(true);
+                    setValues(prevValues => ({
+                      ...prevValues,
+                      street: "",
+                      city: "",
+                      apartment: "",
+                      zip: ""
+                    }));
+                  }
+                }}
+                types={["address"]}
+                componentRestrictions={{ country: "us" }}
+              />
+            </div>
+          </StyledField>
+          {error && (
+            <Badge status="warning">
+              Your address must be in the Twin Cities area.
+            </Badge>
+          )}
 
-        <TextField
-          label="Street"
-          id="street"
-          value={street}
-          onChange={handleTextField}
-          disabled
-        />
-        <Group>
           <TextField
-            label="Apartment"
-            id="apt"
-            value={apt}
+            label="Street"
+            id="street"
+            value={street}
             onChange={handleTextField}
             disabled
           />
-          <TextField
-            label="ZIP code"
-            id="zip"
-            value={zip}
-            onChange={handleTextField}
-            disabled
-          />
-          <TextField
-            label="City"
-            id="city"
-            value={city}
-            disabled
-            onChange={handleTextField}
-          />
-        </Group>
-      </FormLayout>
-    </Card>
+          <Group>
+            <TextField
+              label="Apartment"
+              id="apt"
+              value={apt}
+              onChange={handleTextField}
+              disabled
+            />
+            <TextField
+              label="ZIP code"
+              id="zip"
+              value={zip}
+              onChange={handleTextField}
+              disabled
+            />
+            <TextField
+              label="City"
+              id="city"
+              value={city}
+              disabled
+              onChange={handleTextField}
+            />
+          </Group>
+        </FormLayout>
+      </Card>
     </Wrapper>
   );
 };

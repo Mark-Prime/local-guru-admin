@@ -11,9 +11,12 @@ import {
 import AddProduct from "../../components/AddProduct";
 import EditProductAdmin from "../../components/AddProductAdmin";
 import styled from "styled-components";
+import ProductPhotoUpload from "../../components/ProductPhotoUpload";
 import { useHistory, useParams } from "react-router-dom";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { useSelector } from "react-redux";
+import { TOGGLE_TOAST } from "../../actions/UIActions";
+import { useDispatch } from "react-redux";
 
 const Image = styled.div`
   img {
@@ -49,6 +52,8 @@ const EditSingleProduct = () => {
     }
   ]);
 
+  const dispatch = useDispatch();
+
   const history = useHistory();
   const user = useSelector(state => state.user);
   const productId = useParams().id;
@@ -66,6 +71,22 @@ const EditSingleProduct = () => {
       console.log(array);
 
       setProducts(array);
+    };
+
+    const fetchSingleProductAdmin = async () => {
+      try {
+        const doc = await db
+          .collection("products")
+          .doc(productId)
+          .get();
+        setValues(doc.data());
+        setSeasons(doc.data().seasons);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        console.log("product fetched");
+        setLoaded(true);
+      }
     };
 
     const fetchSingleProduct = async () => {
@@ -100,13 +121,17 @@ const EditSingleProduct = () => {
       }
     };
 
-    if (products.length < 1) {
-      console.log("length zero");
-      fetchProducts();
-    }
+    if (user.admin) {
+      fetchSingleProductAdmin();
+    } else {
+      if (products.length < 1) {
+        console.log("length zero");
+        fetchProducts();
+      }
 
-    if (selected.title === "") {
-      fetchSingleProduct();
+      if (selected.title === "") {
+        fetchSingleProduct();
+      }
     }
   }, [productId, products, selected.title, user.admin, user.uid]);
 
@@ -133,6 +158,7 @@ const EditSingleProduct = () => {
       ...prevValues,
       [id]: value
     }));
+    setTouched(true);
   }, []);
 
   const handleAddUnit = useCallback(() => {
@@ -140,6 +166,7 @@ const EditSingleProduct = () => {
     let updatedUnits = [...units, { value: "lb", price: 0 }];
     // set state with new array
     setUnits(updatedUnits);
+    setTouched(true);
   }, [units]);
 
   const handleRemoveUnit = useCallback(
@@ -150,6 +177,7 @@ const EditSingleProduct = () => {
       updatedUnits.splice(index, 1);
       // set state with new array
       setUnits(updatedUnits);
+      setTouched(true);
     },
     [units]
   );
@@ -231,6 +259,34 @@ const EditSingleProduct = () => {
     setTouched(true);
   }, []);
 
+  const handlePhoto = useCallback(async file => {
+    let url = "";
+    try {
+      const res = await storage
+        .ref()
+        .child(`products/${file.name}`)
+        .put(file);
+
+      if (res.state === "success") {
+        url = await storage
+          .ref()
+          .child(`products/${file.name}`)
+          .getDownloadURL();
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      console.log(url);
+      setValues(prevValues => ({
+        ...prevValues,
+        image: url
+      }));
+      setTouched(true);
+    }
+
+    setTouched(true);
+  }, []);
+
   const handleAddTag = useCallback(
     newTag => {
       setValues(prevValues => ({
@@ -257,6 +313,24 @@ const EditSingleProduct = () => {
     [values.tags]
   );
 
+  const handleSubmitAdmin = useCallback(async () => {
+    try {
+      db.collection("products")
+        .doc(productId)
+        .set(
+          {
+            ...values,
+            seasonsActive: seasons
+          },
+          { merge: true }
+        );
+    } catch (e) {
+      console.log(e);
+    } finally {
+      dispatch({ type: TOGGLE_TOAST, payload: "Product saved" });
+    }
+  }, [dispatch, productId, seasons, values]);
+
   const { title, description, category, maxPrice, tags } = values;
 
   return (
@@ -266,7 +340,7 @@ const EditSingleProduct = () => {
       primaryAction={{
         content: "Save",
         disabled: !touched,
-        onAction: handleSubmit
+        onAction: user.admin ? handleSubmitAdmin : handleSubmit
       }}
     >
       <Layout>
@@ -274,7 +348,6 @@ const EditSingleProduct = () => {
           <Layout.Section>
             {user.admin ? (
               <EditProductAdmin
-                product={products.find(x => x.id === productId)}
                 title={title}
                 selected={selected}
                 description={description}
@@ -323,17 +396,48 @@ const EditSingleProduct = () => {
           </Layout.Section>
         )}
         <Layout.Section secondary>
-          <Card sectioned>
-            <Image>
-              <>
-                {selected.index && (
-                  <img
-                    src={products[selected.index].image}
-                    alt={products[selected.index].title}
-                  />
-                )}
-              </>
-            </Image>
+          <Card
+            sectioned
+            secondaryFooterActions={
+              values.images !== "" && [
+                {
+                  content: "Remove image",
+                  destructive: true,
+                  onAction: () => {
+                    setValues(prevValues => ({
+                      ...prevValues,
+                      image: ""
+                    }));
+                  }
+                }
+              ]
+            }
+          >
+            {user.admin ? (
+              <Image>
+                <>
+                  {values.image !== "" ? (
+                    <img src={values.image} alt={values.title} />
+                  ) : (
+                    <ProductPhotoUpload
+                      className="photo-upload"
+                      onChange={handlePhoto}
+                    />
+                  )}
+                </>
+              </Image>
+            ) : (
+              <Image>
+                <>
+                  {selected.index && (
+                    <img
+                      src={products[selected.index].image}
+                      alt={products[selected.index].title}
+                    />
+                  )}
+                </>
+              </Image>
+            )}
           </Card>
         </Layout.Section>
       </Layout>

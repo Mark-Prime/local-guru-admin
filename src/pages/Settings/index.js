@@ -115,6 +115,7 @@ class Settings extends Component {
   };
 
   handleUpload = file => {
+    console.log(file);
     this.setState({ photo: file });
   };
 

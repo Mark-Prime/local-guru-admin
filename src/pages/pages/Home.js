@@ -8,8 +8,9 @@ import {
   Thumbnail,
   Select
 } from "@shopify/polaris";
+import ProductPhotoUpload from "../../components/ProductPhotoUpload";
 import { TOGGLE_TOAST } from "../../actions/UIActions";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { useDispatch } from "react-redux";
 
 import styled from "styled-components";
@@ -29,63 +30,7 @@ const EditPageHome = () => {
   const [touched, setTouched] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [values, setValues] = useState({});
-  const [blocks, setBlocks] = useState([
-    {
-      left: {
-        heading: "Local Guru",
-        body:
-          "Local Guru is a food hub and curator offering all the best goods from local farms and producers. We partner directly at the source to offer consumers a curated sourced selection of produce and grab-and-go options. Our mission is to make locally grown food easily accessible for the community to enjoy. We believe in the power of healthy eating and that food grown without harsh chemicals is best for our bodies and the environment. Choosing food from farms close to your home minimizes the exposure of toxins in travel-time, translating into fresher food.",
-        type: "text"
-      },
-      right: {
-        heading: "Our Mission",
-        type: "list",
-        items: [
-          "Foster a network of thriving local farms, Urban Farms and Community Gardens",
-          "Provide access to healthy high-quality food",
-          "Support sustainable humane growing practices",
-          "Build a network of new and local economies and ecosystems"
-        ]
-      }
-    },
-    {
-      left: {
-        type: "imageText",
-        image:
-          "https://local-guru-aeac9.firebaseapp.com/static/media/lemons.5d90e5f1.jpg",
-        heading: "Our Goal",
-        body:
-          "We're out to jumpstart the food system. We want to reconnect people with where their food comes from by finding local produce and artisan goods near the city. Partnering up with hundreds of farmers and food makers, providing it all to you through our online market."
-      },
-      right: {
-        type: "imageText",
-        image:
-          "https://local-guru-aeac9.firebaseapp.com/static/media/soil.0d5686b4.jpg",
-        heading: "We Curate, You Customize",
-        body:
-          "As a subscriber, adding or removing whatever you want - minimum order is $20. Your basket is bi-weekly by default, but you can make it weekly or suspend it with one click in your account settings, or suspend deliveries if you’re out of town. You can cancel anytime."
-      }
-    },
-    {
-      left: {
-        type: "imageText",
-        image:
-          "https://local-guru-aeac9.firebaseapp.com/static/media/salad.32dee24e.jpg",
-        heading:
-          "An Online Farmer’s Market: Home to the Freshest Foods in Town",
-        body:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam blandit ultricies euismod. Proin id ultricies eros. Cras mi diam, rhoncus vel nunc ut, aliquam ultrices leo. Cras vitae lectus posuere, luctus dui vitae, placerat puru."
-      },
-      right: {
-        type: "imageText",
-        image:
-          "https://local-guru-aeac9.firebaseapp.com/static/media/produce.56137697.jpg",
-        heading: "We Curate, You Customize",
-        body:
-          "We deliver directly to you. Deliveries are between 10 am and 5pm on Saturdays. Delivery is a flat rate at $9.99. However, if your order is over $40.00, we will waive the fee."
-      }
-    }
-  ]);
+  const [blocks, setBlocks] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,7 +39,13 @@ const EditPageHome = () => {
           .collection("pages")
           .doc("home")
           .get();
-        setValues(res.data());
+        const { heroCTAtext, heroText, heroImage, blocks } = res.data();
+        setValues({
+          heroText: heroText,
+          heroCTAtext: heroCTAtext,
+          heroImage: heroImage
+        });
+        setBlocks(blocks);
         setLoaded(true);
       } catch (e) {
         console.log(e);
@@ -139,8 +90,9 @@ const EditPageHome = () => {
     [blocks]
   );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     try {
+      console.log(blocks);
       db.collection(`pages`)
         .doc(`home`)
         .update({
@@ -155,7 +107,7 @@ const EditPageHome = () => {
       console.log("saved");
       dispatch({ type: TOGGLE_TOAST, payload: `Page saved` });
     }
-  };
+  }, [blocks, dispatch, values.heroCTAtext, values.heroText]);
 
   const handleBlockTypeChange = useCallback(
     (value, id) => {
@@ -171,8 +123,9 @@ const EditPageHome = () => {
           newArray[index] = {
             ...newArray[index],
             [side]: {
-              heading: "",
-              items: []
+              ...newArray[index][side],
+              items: [],
+              type: "list"
             }
           };
           break;
@@ -180,9 +133,7 @@ const EditPageHome = () => {
           newArray[index] = {
             ...newArray[index],
             [side]: {
-              heading: "",
-              body: "",
-              image: null,
+              ...newArray[index][side],
               type: "imageText"
             }
           };
@@ -192,14 +143,34 @@ const EditPageHome = () => {
           newArray[index] = {
             ...newArray[index],
             [side]: {
-              heading: "",
-              body: "",
+              ...newArray[index][side],
               type: "text"
             }
           };
       }
 
       setBlocks(newArray);
+      setTouched(true);
+    },
+    [blocks]
+  );
+
+  const handleAddListItem = useCallback(
+    (side, index) => {
+      const newArray = [...blocks];
+      const newItems = [...newArray[index][side].items];
+      newItems.push("");
+
+      newArray[index] = {
+        ...newArray[index],
+        [side]: {
+          ...newArray[index][side],
+          items: newItems
+        }
+      };
+
+      setBlocks(newArray);
+
       setTouched(true);
     },
     [blocks]
@@ -230,6 +201,61 @@ const EditPageHome = () => {
       setBlocks(newArray);
 
       setTouched(true);
+    },
+    [blocks]
+  );
+
+  const handleRemoveImage = useCallback(
+    (side, index) => {
+      const newArray = [...blocks];
+      newArray[index] = {
+        ...newArray[index],
+        [side]: {
+          ...newArray[index][side],
+          image: ""
+        }
+      };
+      setBlocks(newArray);
+      setTouched(true);
+    },
+    [blocks]
+  );
+
+  const handlePhoto = useCallback(
+    async (side, index, file) => {
+      console.log(`side: ${side}`);
+      console.log(`index: ${index}`);
+      console.log(`file: ${file}`);
+
+      try {
+        const res = await storage
+          .ref()
+          .child(`assets/${file.name}`)
+          .put(file);
+
+        if (res.state === "success") {
+          console.log(res);
+          const url = await storage
+            .ref()
+            .child(`assets/${file.name}`)
+            .getDownloadURL();
+
+          const newArray = [...blocks];
+          console.log(url);
+          newArray[index] = {
+            ...newArray[index],
+            [side]: {
+              ...newArray[index][side],
+              image: url
+            }
+          };
+          console.log(newArray);
+          setBlocks(newArray);
+          setTouched(true);
+        }
+      } catch (e) {
+        console.log(e);
+      }
     },
     [blocks]
   );
@@ -285,13 +311,12 @@ const EditPageHome = () => {
                     {left.type === "list" ? (
                       <FormLayout>
                         <Select
-                          handleBlockTypeChange
                           options={blockOptions}
+                          value={block.left.type}
                           id={`block-${index}-left`}
                           onChange={(value, id) =>
                             handleBlockTypeChange(value, id)
                           }
-                          value={block.left.type}
                         />
                         <TextField
                           label="Heading"
@@ -299,9 +324,28 @@ const EditPageHome = () => {
                           value={left.heading}
                           onChange={handleBlockChange}
                         />
-                        {block.left.items.map(item => (
-                          <TextField />
-                        ))}
+                        <Card
+                          title="List items"
+                          sectioned
+                          actions={[
+                            {
+                              content: "Add item",
+                              onAction: () => handleAddListItem("left", index)
+                            }
+                          ]}
+                        >
+                          <FormLayout>
+                            {block.left.items.map((item, listIndex) => (
+                              <TextField
+                                key={listIndex}
+                                id={`block-${index}-left-listItem-${listIndex}`}
+                                onChange={handleChangeBlockList}
+                                label={`List Item #${listIndex + 1}`}
+                                value={item}
+                              />
+                            ))}
+                          </FormLayout>
+                        </Card>
                       </FormLayout>
                     ) : left.type === "imageText" ? (
                       <FormLayout>
@@ -311,7 +355,25 @@ const EditPageHome = () => {
                           id={`block-${index}-left`}
                           onChange={handleBlockTypeChange}
                         />
-                        <Thumbnail source={block.left.image} size="large" />
+                        {block.left.image !== "" ? (
+                          <Card
+                            sectioned
+                            title="Image"
+                            actions={[
+                              {
+                                content: "Remove image",
+                                destructive: true,
+                                onAction: () => handleRemoveImage("left", index)
+                              }
+                            ]}
+                          >
+                            <Thumbnail source={block.left.image} size="large" />
+                          </Card>
+                        ) : (
+                          <ProductPhotoUpload
+                            onChange={file => handlePhoto("left", index, file)}
+                          />
+                        )}
                         <TextField
                           label="Heading"
                           id={`block-${index}-left-heading`}
@@ -372,7 +434,12 @@ const EditPageHome = () => {
                         <Card
                           title="List items"
                           sectioned
-                          actions={[{ content: "Add item" }]}
+                          actions={[
+                            {
+                              content: "Add item",
+                              onAction: () => handleAddListItem("right", index)
+                            }
+                          ]}
                         >
                           <FormLayout>
                             {block.right.items.map((item, listIndex) => (
@@ -397,7 +464,29 @@ const EditPageHome = () => {
                             handleBlockTypeChange(value, id)
                           }
                         />
-                        <Thumbnail source={block.right.image} size="large" />
+                        {block.right.image !== "" ? (
+                          <Card
+                            sectioned
+                            title="Image"
+                            actions={[
+                              {
+                                content: "Remove image",
+                                destructive: true,
+                                onAction: () =>
+                                  handleRemoveImage("right", index)
+                              }
+                            ]}
+                          >
+                            <Thumbnail
+                              source={block.right.image}
+                              size="large"
+                            />
+                          </Card>
+                        ) : (
+                          <ProductPhotoUpload
+                            onChange={file => handlePhoto("right", index, file)}
+                          />
+                        )}
                         <TextField
                           label="Heading"
                           id={`block-${index}-right-heading`}

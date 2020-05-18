@@ -103,6 +103,7 @@ const useAnalytics = (user, range) => {
         });
         setLoaded(true);
       } catch (err) {
+        setError(err);
         console.log(err);
       }
     };

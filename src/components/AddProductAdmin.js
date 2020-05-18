@@ -78,12 +78,14 @@ class AddProduct extends Component {
           </Card.Section>
           <Card.Section title="tags">
             <FormLayout>
-              <TextField
-                placeholder="Enter tags separated by commas"
-                id="tags"
-                value={this.state.tag}
-                onChange={value => this.handleTag(value)}
-              />
+              <div onKeyDown={this.handleKeyDown}>
+                <TextField
+                  placeholder="Enter tags separated by commas"
+                  id="tags"
+                  value={this.state.tag}
+                  onChange={value => this.handleTag(value)}
+                />
+              </div>
               <Stack>
                 {tags &&
                   tags.map((tag, index) => (
@@ -128,9 +130,7 @@ class AddProduct extends Component {
 AddProduct.propTypes = {
   title: PropTypes.string,
   edit: PropTypes.bool,
-  unit: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  selected: PropTypes.string.isRequired,
   handleProductChoice: PropTypes.func.isRequired,
   handleFocus: PropTypes.func.isRequired,
   handleChangeTextField: PropTypes.func.isRequired,

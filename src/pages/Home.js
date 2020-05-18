@@ -1,13 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  Page,
-  DisplayText,
-  TextStyle,
-  Layout,
-  CalloutCard
-} from "@shopify/polaris";
-import OrderPreview from "../components/OrderPreview";
+import { Page, DisplayText, TextStyle, CalloutCard } from "@shopify/polaris";
 import styled from "styled-components";
 
 const Wrapper = styled.div`

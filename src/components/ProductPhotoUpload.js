@@ -1,57 +1,48 @@
-import React, { Component } from "react";
-import styled from "styled-components";
+import React, { useState, useCallback, useEffect } from "react";
 import { DropZone, Stack, Thumbnail, Caption } from "@shopify/polaris";
 
-class AvatarUpload extends Component {
-  state = {
-    files: []
-  };
+const ProductPhotoUpload = ({ onChange }) => {
+  const [file, setFile] = useState();
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.files !== prevState.files) {
-      this.props.onChange(this.state.files[0]);
+  useEffect(() => {
+    if (file) {
+      onChange(file);
     }
-  }
+  }, [file, onChange]);
 
-  render() {
-    const { files } = this.state;
-    const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
+  const handleDropZoneDrop = useCallback(
+    (_dropFiles, acceptedFiles, _rejectedFiles) => {
+      setFile(file => acceptedFiles[0]);
+    },
+    []
+  );
 
-    const fileUpload = !files.length && <DropZone.FileUpload />;
-    const uploadedFiles = files.length > 0 && (
-      <Stack vertical>
-        {files.map((file, index) => (
-          <Stack alignment="center" key={index}>
-            <Thumbnail
-              size="small"
-              alt={file.name}
-              source={
-                validImageTypes.indexOf(file.type) > 0
-                  ? window.URL.createObjectURL(file)
-                  : "https://cdn.shopify.com/s/files/1/0757/9955/files/New_Post.png?12678548500147524304"
-              }
-            />
-            <div>
-              {file.name} <Caption>{file.size} bytes</Caption>
-            </div>
-          </Stack>
-        ))}
-      </Stack>
-    );
+  const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
 
-    return (
-      <DropZone
-        label="Product photo"
-        allowMultiple={false}
-        onDrop={(files, acceptedFiles, rejectedFiles) => {
-          this.setState({ files: [...this.state.files, ...acceptedFiles] });
-        }}
-      >
-        {uploadedFiles}
-        {fileUpload}
-      </DropZone>
-    );
-  }
-}
+  const fileUpload = !file && <DropZone.FileUpload actionTitle="Add Image" />;
+  const uploadedFile = file && (
+    <Stack>
+      <Thumbnail
+        size="small"
+        alt={file.name}
+        source={
+          validImageTypes.indexOf(file.type) > 0
+            ? window.URL.createObjectURL(file)
+            : "https://cdn.shopify.com/s/files/1/0757/9955/files/New_Post.png?12678548500147524304"
+        }
+      />
+      <div>
+        {file.name} <Caption>{file.size} bytes</Caption>
+      </div>
+    </Stack>
+  );
 
-export default AvatarUpload;
+  return (
+    <DropZone allowMultiple={false} onDrop={handleDropZoneDrop}>
+      {uploadedFile}
+      {fileUpload}
+    </DropZone>
+  );
+};
+
+export default ProductPhotoUpload;

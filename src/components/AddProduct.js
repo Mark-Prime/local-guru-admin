@@ -142,7 +142,6 @@ AddProduct.propTypes = {
   title: PropTypes.string,
   edit: PropTypes.bool,
   description: PropTypes.string.isRequired,
-  selected: PropTypes.number.isRequired,
   handleProductChoice: PropTypes.func.isRequired,
   handleFocus: PropTypes.func.isRequired,
   handleChangeTextField: PropTypes.func.isRequired,
