@@ -6,6 +6,7 @@ export function fetchTransactionsAdmin() {
   return dispatch => {
     return db
       .collection("transactions")
+      .orderBy(`created_at`, "desc")
       .get()
       .then(snapshot => {
         let transactions = [];
