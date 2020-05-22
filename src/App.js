@@ -43,7 +43,11 @@ const Wrapper = styled.div`
 class App extends Component {
   componentDidMount() {
     this.props.getProducer();
-    this.props.fetchTransactions(this.props.user.uid);
+    if (this.props.user.admin) {
+      this.props.fetchTransactionsAdmin();
+    } else {
+      this.props.fetchTransactions(this.props.user.uid);
+    }
   }
 
   componentDidUpdate(prevProps) {
