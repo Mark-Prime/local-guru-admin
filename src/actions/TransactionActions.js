@@ -11,7 +11,9 @@ export function fetchTransactionsAdmin() {
       .then(snapshot => {
         let transactions = [];
 
-        snapshot.docs.map(doc => transactions.push(doc.data()));
+        snapshot.docs.map(doc =>
+          transactions.push({ ...doc.data(), id: doc.id })
+        );
 
         return dispatch({
           type: FETCH_TRANSACTIONS,
