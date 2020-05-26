@@ -17,6 +17,7 @@ import { db } from "../../firebase";
 import emptyProducts from "../../assets/empty-products.svg";
 import styled from "styled-components";
 import { connectInfiniteHits } from "react-instantsearch-dom";
+import defaultImage from "../../assets/default.jpg";
 
 const PaginationFooter = styled.div`
   display: flex;
@@ -113,8 +114,10 @@ const Products = ({ hits, hasMore, refineNext }) => {
   const renderItem = useCallback(
     item => {
       const { product, title, image, id } = item;
-      const media = <Thumbnail alt={title} source={image} />;
-
+      let media = <Thumbnail alt={title} source={defaultImage} />;
+      if (image !== "" && typeof image === "string") {
+        media = <Thumbnail alt={title} source={image} />;
+      }
       return (
         <ResourceList.Item
           id={user.admin ? id : product}
