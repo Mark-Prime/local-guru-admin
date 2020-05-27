@@ -27,6 +27,7 @@ import { toggleToast } from "./actions/UIActions";
 import Settings from "./pages/Settings";
 import Terms from "./pages/Terms";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import { Index } from "react-instantsearch-dom";
 import { getProducer, logoutUser } from "./actions/UserActions";
 import {
   fetchTransactions,
@@ -81,10 +82,12 @@ class App extends Component {
                     component={EditSingleProduct}
                   />
                   <Route path="/order/view/:id" component={ViewOrder} />
-                  <Route
-                    path="/orders"
-                    component={this.props.user.admin ? OrdersAdmin : Orders}
-                  />
+                  <Index indexName="transactions">
+                    <Route
+                      path="/orders"
+                      component={this.props.user.admin ? OrdersAdmin : Orders}
+                    />
+                  </Index>
                   <Route path="/disputes" component={Disputes} />
                   <Route path="/analytics" component={Analytics} />
                   <Route path="/followers" component={Followers} />

@@ -12,6 +12,7 @@ import {
 } from "@shopify/polaris";
 import Moment from "react-moment";
 import styled from "styled-components";
+import { connectInfiniteHits } from "react-instantsearch-dom";
 
 const PaginationFooter = styled.div`
   display: flex;
@@ -20,13 +21,14 @@ const PaginationFooter = styled.div`
   height: 100px;
 `;
 
-const Orders = () => {
+const Orders = ({ hits, refine }) => {
   const transactions = useSelector(state => state.transactions);
 
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [sortValue, setSortValue] = useState("DATE_MODIFIED_DESC");
 
   const handleSearchChange = value => {
     setSearchValue(value);
@@ -87,10 +89,19 @@ const Orders = () => {
           <>
             <ResourceList
               resourceName={resourceName}
-              items={transactions}
+              items={hits}
               renderItem={renderItem}
               selectedItems={selectedItems}
               onSelectionChange={handleSelectionChange}
+              sortValue={sortValue}
+              sortOptions={[
+                { label: "Most Recent", value: "DATE_MODIFIED_DESC" },
+                { label: "Oldest", value: "DATE_MODIFIED_ASC" }
+              ]}
+              onSortChange={selected => {
+                setSortValue(selected);
+                console.log(`Sort option changed to ${selected}.`);
+              }}
             />
             {transactions.length > 49 ? (
               <PaginationFooter>
@@ -113,4 +124,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default connectInfiniteHits(Orders);
