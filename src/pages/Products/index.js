@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import {
   Page,
   Card,
@@ -28,16 +28,16 @@ const PaginationFooter = styled.div`
 `;
 
 const Products = ({ hits, hasMore, refineNext }) => {
-  const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
   const [products, setProducts] = useState([]);
   const [modal, setModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
 
   const user = useSelector(state => state.user);
-  const history = useHistory();
+  // const history = useHistory();
 
   useEffect(() => {
+    console.log("hey!");
     const fetchUserProducts = async () => {
       let array = [];
 

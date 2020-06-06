@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import {
   Page,
@@ -13,6 +13,7 @@ import {
 import Moment from "react-moment";
 import styled from "styled-components";
 import { connectInfiniteHits } from "react-instantsearch-dom";
+import OrdersFilterControl from "./OrdersFilterControl";
 
 const PaginationFooter = styled.div`
   display: flex;
@@ -21,18 +22,14 @@ const PaginationFooter = styled.div`
   height: 100px;
 `;
 
-const Orders = ({ hits, refine }) => {
+const Orders = ({ hits, refinePrevious }) => {
   const transactions = useSelector(state => state.transactions);
 
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [sortValue, setSortValue] = useState("DATE_MODIFIED_DESC");
 
-  const handleSearchChange = value => {
-    setSearchValue(value);
-  };
+  const [sortValue, setSortValue] = useState("DATE_MODIFIED_DESC");
 
   useEffect(() => {
     if (transactions.length > 0) {
@@ -63,7 +60,7 @@ const Orders = ({ hits, refine }) => {
           <p>{user.displayName}</p>
           <Badge status="success">Delivered</Badge>
           <p>
-            <TextStyle>${total.toFixed(2)}</TextStyle>
+            <TextStyle>${total && total.toFixed(2)}</TextStyle>
           </p>
           <p>
             <TextStyle variation="subdued">
@@ -94,6 +91,9 @@ const Orders = ({ hits, refine }) => {
               selectedItems={selectedItems}
               onSelectionChange={handleSelectionChange}
               sortValue={sortValue}
+              filterControl={
+                <OrdersFilterControl attribute="user.displayName" />
+              }
               sortOptions={[
                 { label: "Most Recent", value: "DATE_MODIFIED_DESC" },
                 { label: "Oldest", value: "DATE_MODIFIED_ASC" }

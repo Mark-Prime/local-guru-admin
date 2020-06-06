@@ -82,17 +82,11 @@ class App extends Component {
                     component={EditSingleProduct}
                   />
                   <Route path="/order/view/:id" component={ViewOrder} />
-                  <Index indexName="transactions">
-                    <Route
-                      path="/orders"
-                      component={this.props.user.admin ? OrdersAdmin : Orders}
-                    />
-                  </Index>
                   <Route path="/disputes" component={Disputes} />
                   <Route path="/analytics" component={Analytics} />
                   <Route path="/followers" component={Followers} />
+                  <Route path="/products" component={Products} />
                   <Route path="/products/add" component={AddSingleProduct} />
-                  <Route exact path="/products" component={Products} />
                   <Route path="/account" component={Settings} />
                   <Route path="/create-account" component={Register} />
                   <Route path="/open-house" component={OpenHouse} />
@@ -109,6 +103,12 @@ class App extends Component {
                   <Route path="/privacy-policy" component={PrivacyPolicy} />
                   <Route path="/help" component={Help} />
                   <Route path="/pages/edit/home" component={EditPageHome} />
+                  <Index indexName="transactions">
+                    <Route
+                      path="/orders"
+                      component={this.props.user.admin ? OrdersAdmin : Orders}
+                    />
+                  </Index>
                 </Switch>
               </Section>
             </Layout>
