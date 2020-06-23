@@ -75,7 +75,6 @@ export function fetchSingleTransaction(id) {
     .doc(id)
     .get()
     .then(doc => {
-      console.log(doc.data());
       return doc.data();
     });
 }

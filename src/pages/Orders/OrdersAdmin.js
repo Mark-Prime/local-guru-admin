@@ -6,7 +6,7 @@ import {
   ResourceList,
   TextStyle,
   Pagination,
-  Thumbnail,
+  Avatar,
   Badge,
   Stack
 } from "@shopify/polaris";
@@ -20,6 +20,12 @@ const PaginationFooter = styled.div`
   align-items: center;
   justify-content: center;
   height: 100px;
+`;
+
+const Divider = styled.div`
+  margin: 2rem 0;
+  background: rgba(0, 0, 0, 0.12);
+  height: 1px;
 `;
 
 const Orders = ({ hits, refinePrevious }) => {
@@ -46,14 +52,21 @@ const Orders = ({ hits, refinePrevious }) => {
   const onPrev = () => {};
 
   const renderItem = item => {
-    const { id, title, created_at, user, total, items } = item;
-    const firstItem = Object.values(items)[0];
+    const { objectID, title, created_at, user, total, items, producer } = item;
+    const media = (
+      <Avatar
+        customer
+        size="medium"
+        source={user.photoURL}
+        name={user.displayName}
+      />
+    );
 
     return (
       <ResourceList.Item
-        id={id}
-        media={<Thumbnail source={firstItem.image} alt={firstItem.title} />}
-        url={`/order/view/${id}`}
+        id={objectID}
+        media={media}
+        url={`/order/view/${objectID}`}
         accessibilityLabel={`View details for ${title}`}
       >
         <Stack distribution="fillEvenly" spacing="extraLoose">
@@ -70,6 +83,29 @@ const Orders = ({ hits, refinePrevious }) => {
             </TextStyle>
           </p>
         </Stack>
+        <br />
+        <Divider />
+        <Stack spacing="tight">
+          <TextStyle variation="subdued">Item(s):</TextStyle>
+          {items.map((item, index) => (
+            <span>{item.title}</span>
+          ))}
+        </Stack>
+        <br />
+        <Stack spacing="tight">
+          <TextStyle variation="subdued">From seller(s):</TextStyle>
+          {items.map((item, index) => {
+            const { producer } = item;
+            const { displayName } = producer;
+            return (
+              <span>
+                {displayName}
+                {index < items.length - 1 && `, `}
+              </span>
+            );
+          })}
+        </Stack>
+        <br />
       </ResourceList.Item>
     );
   };

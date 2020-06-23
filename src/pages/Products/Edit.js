@@ -47,8 +47,8 @@ const EditSingleProduct = () => {
   const [units, setUnits] = useState([
     {
       value: "lb",
-      price: "0",
-      max: ""
+      price: 0,
+      max: null
     }
   ]);
 

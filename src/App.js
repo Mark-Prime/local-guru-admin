@@ -85,7 +85,7 @@ class App extends Component {
                   <Route path="/disputes" component={Disputes} />
                   <Route path="/analytics" component={Analytics} />
                   <Route path="/followers" component={Followers} />
-                  <Route path="/products" component={Products} />
+                  <Route exact path="/products" component={Products} />
                   <Route path="/products/add" component={AddSingleProduct} />
                   <Route path="/account" component={Settings} />
                   <Route path="/create-account" component={Register} />

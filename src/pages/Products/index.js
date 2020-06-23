@@ -187,7 +187,7 @@ const Products = ({ hits, hasMore, refineNext }) => {
             </>
             <Card>
               <ResourceList
-                items={hits}
+                items={user.admin ? hits : products}
                 resourceName={resourceName}
                 renderItem={renderItem}
                 selectedItems={selectedItems}
@@ -195,9 +195,11 @@ const Products = ({ hits, hasMore, refineNext }) => {
                 selectable
                 promotedBulkActions={promotedBulkActions}
               />
-              <PaginationFooter>
-                <Button onClick={refineNext}>Load More</Button>
-              </PaginationFooter>
+              {products.length > 50 && (
+                <PaginationFooter>
+                  <Button onClick={refineNext}>Load More</Button>
+                </PaginationFooter>
+              )}
             </Card>
           </>
         ) : (
